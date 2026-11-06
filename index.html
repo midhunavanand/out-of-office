@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Out of Office — everyday essentials for wherever you're headed.">
+  <title>Out of Office — Gear for the in-between</title>
+  <style>
+    :root{--ink:#18231f;--muted:#68736d;--paper:#f6f5ef;--white:#fff;--accent:#d9f36a;--line:#dfe2d8;--dark:#24332d}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+    button,input{font:inherit}button{cursor:pointer}.announcement{background:var(--dark);color:#fff;text-align:center;padding:10px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase}
+    header{height:76px;padding:0 5vw;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:5}
+    .logo{font-size:23px;font-weight:900;letter-spacing:-1.5px;text-decoration:none;color:var(--ink)}.logo span{color:#849b39}
+    nav{display:flex;gap:28px}nav a{color:var(--ink);text-decoration:none;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:bold}
+    .header-actions{display:flex;align-items:center;gap:18px}.icon-btn{border:0;background:none;color:var(--ink);font-size:13px;font-weight:bold}.cart-count{display:inline-grid;place-items:center;background:var(--accent);width:22px;height:22px;border-radius:50%;margin-left:5px;font-size:11px}
+    .hero{margin:22px auto 0;width:94%;min-height:480px;background:#d9e0d4;position:relative;overflow:hidden;display:flex;align-items:center}
+    .hero-copy{padding:7vw;max-width:650px;position:relative;z-index:1}.eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;color:#536158}
+    h1{font-size:clamp(48px,7vw,92px);line-height:.91;letter-spacing:-6px;margin:20px 0 22px;max-width:600px}.hero p{font-size:16px;line-height:1.6;max-width:390px;color:#46534b}
+    .primary{background:var(--ink);color:white;border:0;padding:15px 22px;text-transform:uppercase;letter-spacing:1px;font-size:11px;font-weight:bold;margin-top:12px}.primary:hover{background:#536158}
+    .hero-art{position:absolute;right:4%;bottom:-3%;width:43%;height:92%;background:linear-gradient(145deg,#b5c3b5,#718477);border-radius:48% 48% 0 0;transform:rotate(-4deg)}
+    .hero-art:before{content:"";position:absolute;width:44%;height:76%;left:28%;top:12%;background:linear-gradient(120deg,#e7e4d8,#b6c1ae);border-radius:45% 45% 18% 18%;box-shadow:24px 20px 0 #435b4c}
+    .hero-art:after{content:"OOO";position:absolute;bottom:12%;left:35%;font-size:clamp(25px,4vw,54px);font-weight:900;letter-spacing:-4px;color:#34483c;transform:rotate(-4deg)}
+    .section{width:90%;margin:82px auto}.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:26px}.section h2{font-size:36px;letter-spacing:-2px;margin:8px 0}.section-head p{color:var(--muted);font-size:13px}
+    .products{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.product-image{height:270px;display:grid;place-items:center;position:relative;overflow:hidden;background:#e4e5dc}
+    .product-image:before{content:"";width:48%;height:72%;border-radius:42% 42% 12% 12%;background:var(--product,#b5c2ad);box-shadow:inset -18px -5px 0 #00000012,12px 10px 0 #0000000d}
+    .product-image:after{content:attr(data-mark);position:absolute;font-size:29px;font-weight:900;letter-spacing:-2px;color:#ffffffaa}
+    .product-card:nth-child(2) .product-image{background:#e8ded1}.product-card:nth-child(3) .product-image{background:#dce3e5}.product-card:nth-child(4) .product-image{background:#e8e6d8}
+    .product-info{padding:14px 2px}.product-info h3{font-size:14px;margin:0 0 7px}.product-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+    .add-btn{width:100%;margin-top:13px;border:1px solid var(--ink);background:transparent;padding:11px;text-transform:uppercase;font-size:10px;letter-spacing:1px;font-weight:bold}.add-btn:hover{background:var(--ink);color:#fff}
+    .story{background:var(--accent);padding:58px 7vw;display:flex;justify-content:space-between;align-items:center;gap:30px}.story h2{font-size:clamp(32px,5vw,58px);letter-spacing:-3px;max-width:600px;margin:10px 0}.story p{max-width:350px;line-height:1.6;font-size:14px}
+    footer{padding:35px 5vw;background:var(--dark);color:white;display:flex;justify-content:space-between;gap:20px;font-size:12px}footer a{color:white}
+    .overlay{position:fixed;inset:0;background:#0007;z-index:10;display:none}.overlay.open{display:block}.cart-panel{position:absolute;right:0;top:0;height:100%;width:min(430px,100%);background:var(--paper);padding:26px;overflow:auto}
+    .cart-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:18px}.cart-head h2{margin:0}.close{border:0;background:none;font-size:26px}.cart-item{display:flex;justify-content:space-between;gap:15px;padding:18px 0;border-bottom:1px solid var(--line);font-size:13px}.cart-item small{display:block;color:var(--muted);margin-top:5px}.qty-controls{display:flex;gap:8px;align-items:center}.qty-controls button{border:1px solid var(--line);background:white;width:26px;height:26px}
+    .cart-total{display:flex;justify-content:space-between;font-weight:bold;margin:24px 0}.empty{color:var(--muted);padding:35px 0;text-align:center;font-size:14px}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--dark);color:#fff;padding:13px 20px;font-size:12px;z-index:20;transition:.25s}.toast.show{transform:translateX(-50%) translateY(0)}
+    @media(max-width:800px){nav{display:none}.hero{min-height:560px}.hero-copy{padding:9vw;align-self:flex-start}.hero-art{width:65%;height:48%;right:0}.products{grid-template-columns:repeat(2,1fr)}.product-image{height:220px}.story,footer{flex-direction:column;align-items:flex-start}}
+    @media(max-width:430px){.products{gap:10px}.product-image{height:175px}.section{width:92%;margin:55px auto}.section h2{font-size:29px}h1{letter-spacing:-3px}}
+  </style>
+</head>
+<body>
+  <div class="announcement">A little less routine. A little more out there. &nbsp; — &nbsp; Free shipping over ₹2,500</div>
+  <header>
+    <a class="logo" href="#">OUT OF <span>OFFICE.</span></a>
+    <nav><a href="#shop">Shop</a><a href="#story">Our idea</a><a href="#shop">New arrivals</a></nav>
+    <div class="header-actions"><button class="icon-btn" id="searchBtn">SEARCH</button><button class="icon-btn" id="cartBtn">BAG <span class="cart-count" id="cartCount">0</span></button></div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="hero-copy"><div class="eyebrow">The everyday escape collection</div><h1>GEAR FOR THE IN-BETWEEN.</h1><p>For early starts, longer routes, last-minute plans and everything that happens when you step away from the usual.</p><button class="primary" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">Explore the collection ↗</button></div>
+      <div class="hero-art" aria-hidden="true"></div>
+    </section>
+    <section class="section" id="shop">
+      <div class="section-head"><div><div class="eyebrow">Made to move</div><h2>THE CURRENT ROTATION</h2></div><p>Useful things. Good days. No big plan required.</p></div>
+      <div class="products" id="products"></div>
+    </section>
+    <section class="story" id="story"><div><div class="eyebrow">A note from us</div><h2>WORK CAN WAIT.<br>THE WORLD WON'T.</h2></div><p>Out of Office is a fictional demo brand built for curious people and better journeys. This little storefront is also our playground for learning how digital experiences are measured.</p></section>
+  </main>
+  <footer><strong>OUT OF OFFICE.</strong><span>Fictional demo store · Built for Adobe Analytics practice</span><span>© 2026 Out of Office</span></footer>
+  <div class="overlay" id="cartOverlay"><aside class="cart-panel"><div class="cart-head"><h2>Your bag</h2><button class="close" id="closeCart" aria-label="Close cart">×</button></div><div id="cartItems"></div><div class="cart-total"><span>Subtotal</span><span id="cartTotal">₹0</span></div><button class="primary" style="width:100%" id="checkoutBtn">Continue to checkout</button><p style="font-size:11px;color:var(--muted)">Demo only — no payment will be collected.</p></aside></div>
+  <div class="toast" id="toast" role="status"></div>
+  <script>
+    const products=[
+      {id:"OOO-101",name:"Weekender Overshirt",category:"Clothing",price:2490,color:"#a8b7a5",mark:"OOO"},
+      {id:"OOO-102",name:"Anywhere Daypack",category:"Bags",price:1890,color:"#b98f70",mark:"GO"},
+      {id:"OOO-103",name:"Off-Duty Bottle",category:"Accessories",price:790,color:"#8ea9b4",mark:"H₂O"},
+      {id:"OOO-104",name:"Slow Morning Cap",category:"Accessories",price:990,color:"#c4b98e",mark:"SLOW"}
+    ];
+    const cart={};
+    const money=n=>"₹"+n.toLocaleString("en-IN");
+    const productRoot=document.getElementById("products");
+    productRoot.innerHTML=products.map((p,i)=>`<article class="product-card"><div class="product-image" style="--product:${p.color}" data-mark="${p.mark}"></div><div class="product-info"><h3>${p.name}</h3><div class="product-meta"><span>${p.category}</span><strong>${money(p.price)}</strong></div><button class="add-btn" data-product-id="${p.id}">Add to bag +</button></div></article>`).join("");
+    function notify(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
+    function renderCart(){
+      const entries=Object.entries(cart);document.getElementById("cartCount").textContent=entries.reduce((s,[,q])=>s+q,0);
+      const root=document.getElementById("cartItems");
+      if(!entries.length){root.innerHTML='<div class="empty">Your bag is taking a little break.</div>'}
+      else root.innerHTML=entries.map(([id,q])=>{const p=products.find(x=>x.id===id);return `<div class="cart-item"><div><strong>${p.name}</strong><small>${p.id} · ${money(p.price)} each</small></div><div class="qty-controls"><button data-change="-1" data-id="${id}">−</button><span>${q}</span><button data-change="1" data-id="${id}">+</button></div></div>`}).join("");
+      const total=entries.reduce((s,[id,q])=>s+products.find(p=>p.id===id).price*q,0);document.getElementById("cartTotal").textContent=money(total);
+    }
+    productRoot.addEventListener("click",e=>{const b=e.target.closest("[data-product-id]");if(!b)return;const id=b.dataset.productId;cart[id]=(cart[id]||0)+1;renderCart();notify("Added to your bag");});
+    document.getElementById("cartItems").addEventListener("click",e=>{const b=e.target.closest("[data-change]");if(!b)return;const id=b.dataset.id;cart[id]+=Number(b.dataset.change);if(cart[id]<=0)delete cart[id];renderCart();});
+    const overlay=document.getElementById("cartOverlay");document.getElementById("cartBtn").onclick=()=>overlay.classList.add("open");document.getElementById("closeCart").onclick=()=>overlay.classList.remove("open");overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.remove("open")});
+    document.getElementById("checkoutBtn").onclick=()=>{if(!Object.keys(cart).length){notify("Your bag is empty");return}notify("Demo checkout started");};
+    document.getElementById("searchBtn").onclick=()=>{const term=prompt("What are you looking for?");if(term!==null){const cards=[...document.querySelectorAll(".product-card")];let shown=0;cards.forEach((c,i)=>{const match=products[i].name.toLowerCase().includes(term.toLowerCase())||products[i].category.toLowerCase().includes(term.toLowerCase());c.style.display=match?"":"none";if(match)shown++});notify(shown+" matching product(s)");}};
+    renderCart();
+  </script>
+</body>
+</html>
