@@ -1,0 +1,2429 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Out of Office | Travel-ready clothing, bags and gear</title>
+<meta name="description" content="Out of Office makes contemporary clothing, bags and accessories for people who travel, explore and live actively. Free delivery across India over ₹2,999.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&display=swap" rel="stylesheet">
+<!--
+  ============================================================
+  OUT OF OFFICE — demo e-commerce site
+  Built for practising Adobe Analytics / AEP Tags / Web SDK.
+
+  • Single file, vanilla HTML/CSS/JS, no build step.
+  • Hash-based routing (#/shop/men, #/product/ID …) so it runs on GitHub Pages.
+  • Data layer: window.oooDataLayer (array of structured events).
+    Every push also dispatches a window CustomEvent "ooo:datalayer"
+    with the event object in event.detail — use that in Adobe Tags.
+  • NO Adobe libraries, org IDs, datastream IDs or report suite IDs are included.
+  ============================================================
+-->
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --paper:#FAF8F4;      /* off-white page */
+  --sand:#EEE7DB;       /* beige surface */
+  --sand-2:#E2D7C4;     /* deeper beige */
+  --ink:#272725;        /* charcoal text */
+  --ink-2:#5E5B55;      /* secondary text */
+  --line:#DDD4C5;       /* hairlines */
+  --pine:#4D5B47;       /* muted green, primary */
+  --pine-2:#3B4737;
+  --sage:#DCE2D3;       /* light green tint */
+  --marigold:#D4852F;   /* subtle orange accent */
+  --marigold-soft:#F5E4CD;
+  --danger:#A3442D;
+  --white:#FFFFFF;
+  --r-s:6px; --r-m:12px; --r-l:18px; --pill:999px;
+  --font:'Archivo', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --max:1360px;
+  --gut:clamp(16px, 4vw, 48px);
+  --shadow:0 18px 40px -18px rgba(39,39,37,.35);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.55;font-stretch:100%;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--marigold);outline-offset:3px;border-radius:4px}
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:var(--pill);z-index:999}
+.skip:focus{left:8px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gut)}
+body.no-scroll{overflow:hidden}
+
+/* ---------- Typography ---------- */
+.display{font-stretch:125%;font-weight:800;letter-spacing:-.025em;line-height:.98}
+h1,h2,h3,h4{margin:0;font-weight:700}
+h2.sec-title{font-stretch:122%;font-size:clamp(26px,3vw,40px);letter-spacing:-.02em;line-height:1.05}
+.muted{color:var(--ink-2)}
+.small{font-size:14px}
+.tiny{font-size:13px}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid transparent;border-radius:var(--pill);padding:13px 24px;font-weight:600;font-size:15px;text-decoration:none;transition:background .2s,color .2s,border-color .2s,transform .15s;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--ink);color:var(--paper)}
+.btn-primary:hover{background:var(--pine)}
+.btn-green{background:var(--pine);color:var(--paper)}
+.btn-green:hover{background:var(--pine-2)}
+.btn-light{background:var(--paper);color:var(--ink)}
+.btn-light:hover{background:var(--sand)}
+.btn-outline{border-color:var(--ink);background:transparent}
+.btn-outline:hover{background:var(--ink);color:var(--paper)}
+.btn-ghost-light{border-color:rgba(250,248,244,.7);color:var(--paper);background:transparent}
+.btn-ghost-light:hover{background:var(--paper);color:var(--ink)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn-block{width:100%}
+.link-btn{background:none;border:0;padding:0;text-decoration:underline;text-underline-offset:3px;font-weight:600;font-size:14px}
+.icon-btn{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:50%;border:0;background:transparent;position:relative;text-decoration:none}
+.icon-btn:hover{background:var(--sand)}
+.icon-btn svg{width:22px;height:22px}
+.count-badge{position:absolute;top:3px;right:1px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--marigold);color:var(--white);font-size:11px;font-weight:700;display:grid;place-items:center;line-height:1}
+.count-badge[hidden]{display:none}
+
+/* ============================================================
+   ANNOUNCEMENT BAR + HEADER
+   ============================================================ */
+.announce{background:var(--pine);color:var(--paper);font-size:13.5px}
+.announce .wrap{display:flex;align-items:center;justify-content:center;gap:12px;min-height:38px}
+.announce p{margin:0;text-align:center;flex:0 1 auto}
+.announce a{font-weight:600}
+.announce button{background:none;border:0;color:inherit;opacity:.75;padding:4px 8px;font-size:16px}
+.announce button:hover{opacity:1}
+
+.site-header{position:sticky;top:0;z-index:50;background:rgba(250,248,244,.94);backdrop-filter:saturate(1.2) blur(10px);border-bottom:1px solid var(--line)}
+.header-inner{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:24px;min-height:70px}
+.menu-btn{display:none}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-stretch:125%;font-weight:800;font-size:22px;letter-spacing:-.03em;white-space:nowrap}
+.logo-dot{width:11px;height:11px;border-radius:50%;background:var(--marigold);box-shadow:0 0 0 4px var(--marigold-soft)}
+.main-nav{display:flex;justify-content:center}
+.main-nav>ul{display:flex;gap:4px;list-style:none;margin:0;padding:0}
+.nav-item{position:relative}
+.nav-link{display:block;padding:10px 14px;text-decoration:none;font-weight:500;font-size:15px;border-radius:var(--pill)}
+.nav-link:hover{background:var(--sand)}
+.nav-link.is-active{background:var(--ink);color:var(--paper)}
+.nav-link.sale{color:var(--danger)}
+.nav-link.sale.is-active{background:var(--danger);color:var(--paper)}
+.mega{position:absolute;left:50%;top:100%;transform:translate(-50%,8px);background:var(--paper);border:1px solid var(--line);border-radius:var(--r-m);padding:18px 20px;min-width:230px;box-shadow:var(--shadow);opacity:0;visibility:hidden;transition:opacity .18s,transform .18s}
+.nav-item:hover .mega,.nav-item:focus-within .mega{opacity:1;visibility:visible;transform:translate(-50%,2px)}
+.mega ul{list-style:none;margin:0;padding:0}
+.mega a{display:block;padding:6px 0;text-decoration:none;color:var(--ink-2)}
+.mega a:hover{color:var(--ink)}
+.mega .mega-all{margin-top:8px;padding-top:10px;border-top:1px solid var(--line);font-weight:600;color:var(--ink)}
+.header-actions{display:flex;align-items:center;gap:4px}
+.search{position:relative}
+.search input{width:230px;height:42px;border:1px solid var(--line);background:var(--white);border-radius:var(--pill);padding:0 16px 0 40px;font-size:14.5px}
+.search input:focus{outline:none;border-color:var(--ink)}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--ink-2)}
+.suggest{position:absolute;right:0;top:calc(100% + 8px);width:340px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-m);box-shadow:var(--shadow);padding:8px;z-index:60}
+.suggest[hidden]{display:none}
+.suggest a,.suggest button{display:flex;gap:12px;align-items:center;padding:8px;border-radius:8px;text-decoration:none;width:100%;border:0;background:none;text-align:left}
+.suggest a:hover,.suggest a:focus,.suggest button:hover{background:var(--sand)}
+.suggest img{width:44px;height:54px;object-fit:cover;border-radius:6px;background:var(--sand)}
+.suggest .s-name{font-weight:600;font-size:14px;line-height:1.3}
+.suggest .s-meta{font-size:13px;color:var(--ink-2)}
+.suggest .s-empty{padding:12px;font-size:14px;color:var(--ink-2)}
+
+/* ============================================================
+   HOME
+   ============================================================ */
+.hero{position:relative;min-height:min(86vh,820px);display:flex;align-items:flex-end;color:var(--paper);overflow:hidden;background:#3c3a35}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(28,28,26,.72) 0%,rgba(28,28,26,.35) 45%,rgba(28,28,26,0) 75%),linear-gradient(0deg,rgba(28,28,26,.55),rgba(28,28,26,0) 45%)}
+.hero-inner{position:relative;z-index:1;width:100%;display:grid;grid-template-columns:1.25fr .75fr;gap:40px;align-items:end;padding-top:80px;padding-bottom:clamp(40px,7vw,88px)}
+.hero h1{font-size:clamp(52px,8.4vw,128px)}
+.hero p.lede{max-width:44ch;font-size:clamp(17px,1.5vw,20px);margin:22px 0 30px;color:rgba(250,248,244,.9)}
+.hero .btns{display:flex;flex-wrap:wrap;gap:12px}
+.autoreply{justify-self:end;width:min(100%,360px);background:var(--paper);color:var(--ink);border-radius:var(--r-m);padding:20px 22px 18px;box-shadow:0 30px 60px -20px rgba(0,0,0,.55);transform:rotate(-1.6deg);transform-origin:bottom right;animation:arIn .9s cubic-bezier(.2,.8,.2,1) .35s both}
+@keyframes arIn{from{opacity:0;transform:translateY(24px) rotate(2deg)}to{opacity:1;transform:rotate(-1.6deg)}}
+.ar-head{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--pine)}
+.ar-head .logo-dot{width:9px;height:9px;box-shadow:0 0 0 3px var(--marigold-soft)}
+.autoreply dl{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:12px 0;padding-bottom:12px;border-bottom:1px solid var(--line);font-size:13.5px}
+.autoreply dt{color:var(--ink-2)}
+.autoreply dd{margin:0;font-weight:500}
+.autoreply p{margin:0 0 8px;font-size:15px;line-height:1.5}
+.autoreply .ar-sign{margin:0;font-weight:600}
+
+.section{padding:clamp(56px,7vw,96px) 0}
+.section.tight{padding-top:0}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:28px}
+.sec-head p{margin:8px 0 0;color:var(--ink-2);max-width:52ch}
+.sec-head .link-btn,.sec-head a.view-all{font-weight:600;font-size:15px;white-space:nowrap;text-decoration:underline;text-underline-offset:4px}
+
+.collections{display:grid;grid-template-columns:1.3fr 1fr 1fr;grid-template-rows:280px 280px;gap:16px}
+.coll{position:relative;border-radius:var(--r-m);overflow:hidden;color:var(--paper);text-decoration:none;display:flex;align-items:flex-end;background:var(--sand-2)}
+.coll:first-child{grid-row:span 2}
+.coll:nth-child(4){grid-column:span 2}
+.coll img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.coll:hover img{transform:scale(1.04)}
+.coll::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(28,28,26,.65),rgba(28,28,26,0) 60%)}
+.coll-body{position:relative;z-index:1;padding:22px 24px;width:100%;display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.coll h3{font-stretch:120%;font-size:clamp(22px,2.2vw,30px);letter-spacing:-.02em}
+.coll p{margin:4px 0 0;font-size:14px;opacity:.9;max-width:34ch}
+.coll .pill{background:var(--paper);color:var(--ink);border-radius:var(--pill);padding:8px 14px;font-size:13.5px;font-weight:600;white-space:nowrap}
+
+.promo{position:relative;border-radius:var(--r-l);overflow:hidden;color:var(--paper);min-height:420px;display:flex;align-items:center;background:var(--pine)}
+.promo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55;mix-blend-mode:luminosity}
+.promo-body{position:relative;padding:clamp(28px,5vw,64px);max-width:620px}
+.promo h2{font-size:clamp(34px,4.6vw,64px)}
+.promo p{font-size:18px;margin:16px 0 26px;max-width:42ch}
+.promo .code{display:inline-block;border:1.5px dashed rgba(250,248,244,.8);border-radius:6px;padding:2px 8px;font-weight:700;letter-spacing:.02em}
+
+.scroller-wrap{position:relative}
+.scroller{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 3*16px)/4);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}
+.scroller::-webkit-scrollbar{display:none}
+.scroller>*{scroll-snap-align:start}
+.scroll-btns{display:flex;gap:8px}
+.scroll-btns button{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--paper);display:grid;place-items:center}
+.scroll-btns button:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.scroll-btns svg{width:18px;height:18px}
+
+.story{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);align-items:center}
+.story-img{border-radius:var(--r-l);overflow:hidden;aspect-ratio:4/5;background:var(--sand-2)}
+.story-img img{width:100%;height:100%;object-fit:cover}
+.story h2{font-size:clamp(32px,4vw,54px);font-stretch:125%;letter-spacing:-.025em;line-height:1.02;font-weight:800}
+.story .body{font-size:18px;line-height:1.65;color:var(--ink-2);max-width:56ch;margin:22px 0 30px}
+.values{display:grid;gap:18px;border-top:1px solid var(--line);padding-top:24px}
+.values div{display:grid;grid-template-columns:180px 1fr;gap:16px}
+.values strong{font-weight:700}
+.values span{color:var(--ink-2)}
+
+.testis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.testi{background:var(--sand);border-radius:var(--r-m);padding:28px;display:flex;flex-direction:column;gap:18px}
+.testi blockquote{margin:0;font-size:19px;line-height:1.45;font-weight:500;letter-spacing:-.005em}
+.testi footer{margin-top:auto;font-size:14px;color:var(--ink-2)}
+.testi footer strong{display:block;color:var(--ink);font-size:15px}
+.testi a{font-weight:600}
+
+.newsletter{background:var(--ink);color:var(--paper);border-radius:var(--r-l);padding:clamp(32px,5vw,64px);display:grid;grid-template-columns:1.1fr 1fr;gap:32px;align-items:center}
+.newsletter h2{font-size:clamp(30px,3.4vw,46px);font-stretch:125%;font-weight:800;letter-spacing:-.025em;line-height:1.02}
+.newsletter p{color:rgba(250,248,244,.75);margin:14px 0 0;max-width:44ch}
+.nl-form{display:flex;gap:10px;flex-wrap:wrap}
+.nl-form input{flex:1 1 220px;height:52px;border-radius:var(--pill);border:1px solid rgba(250,248,244,.3);background:rgba(250,248,244,.06);color:var(--paper);padding:0 20px;font-size:15.5px}
+.nl-form input::placeholder{color:rgba(250,248,244,.55)}
+.nl-form input:focus{outline:none;border-color:var(--marigold)}
+.nl-form .field-error{flex-basis:100%;color:#F2B98A}
+.nl-success{display:flex;gap:14px;align-items:flex-start;background:rgba(250,248,244,.08);border-radius:var(--r-m);padding:18px 20px}
+.nl-success .tick{width:32px;height:32px;border-radius:50%;background:var(--marigold);display:grid;place-items:center;flex:none;color:var(--white)}
+.nl-success p{margin:4px 0 0;color:rgba(250,248,244,.8)}
+
+/* ============================================================
+   PRODUCT CARD + GRID
+   ============================================================ */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px 16px}
+.grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.card{position:relative;display:flex;flex-direction:column;min-width:0}
+.card-media{position:relative;border-radius:var(--r-m);overflow:hidden;background:var(--sand);aspect-ratio:4/5}
+.card-media>a{display:block;height:100%}
+.card-media img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.card:hover .card-media img{transform:scale(1.035)}
+.card.is-out .card-media img{filter:grayscale(.5);opacity:.75}
+.badges{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none}
+.badge{background:var(--paper);color:var(--ink);font-size:12px;font-weight:600;padding:4px 9px;border-radius:var(--pill)}
+.badge-sale{background:var(--marigold);color:var(--white)}
+.badge-new{background:var(--pine);color:var(--paper)}
+.badge-out{background:var(--ink);color:var(--paper)}
+.wish-btn{position:absolute;top:8px;right:8px;width:38px;height:38px;border-radius:50%;border:0;background:rgba(250,248,244,.92);display:grid;place-items:center;transition:transform .15s}
+.wish-btn:hover{transform:scale(1.08)}
+.wish-btn svg{width:19px;height:19px}
+.wish-btn[aria-pressed="true"] svg{fill:var(--marigold);stroke:var(--marigold)}
+.card-actions{position:absolute;left:10px;right:10px;bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s}
+.card:hover .card-actions,.card:focus-within .card-actions{opacity:1;transform:none}
+.card-actions button{border:0;border-radius:var(--pill);padding:10px 8px;font-size:13.5px;font-weight:600;background:var(--paper);color:var(--ink)}
+.card-actions button:hover{background:var(--sand)}
+.card-actions button.add{background:var(--ink);color:var(--paper)}
+.card-actions button.add:hover{background:var(--pine)}
+.card-actions button[disabled]{opacity:.55;cursor:not-allowed}
+.size-pop{position:absolute;left:8px;right:8px;bottom:8px;background:var(--paper);border-radius:10px;padding:12px;box-shadow:var(--shadow);z-index:2}
+.size-pop[hidden]{display:none}
+.size-pop p{margin:0 0 8px;font-size:13px;font-weight:600}
+.size-pop-grid{display:flex;flex-wrap:wrap;gap:6px}
+.size-pop-grid button{min-width:42px;height:36px;border:1px solid var(--line);background:var(--white);border-radius:8px;font-size:13px;font-weight:600}
+.size-pop-grid button:hover:not([disabled]){border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.size-pop-grid button[disabled]{text-decoration:line-through;opacity:.4;cursor:not-allowed}
+.size-pop-close{position:absolute;top:6px;right:6px;border:0;background:none;font-size:20px;line-height:1;width:28px;height:28px}
+.card-body{padding:12px 2px 0;display:flex;flex-direction:column;gap:3px}
+.card-title{font-weight:600;font-size:15.5px;text-decoration:none;line-height:1.3}
+.card-title:hover{text-decoration:underline;text-underline-offset:3px}
+.card-meta{font-size:13.5px;color:var(--ink-2);margin:0}
+.price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-weight:600}
+.price s{color:var(--ink-2);font-weight:400;font-size:.9em}
+.price .off{color:var(--marigold);font-size:.85em;font-weight:700}
+.rating-row{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2)}
+.stars{position:relative;display:inline-block;font-size:13px;letter-spacing:1px;line-height:1}
+.stars::before{content:"★★★★★";background:linear-gradient(90deg,var(--marigold) calc(var(--r) / 5 * 100%),var(--sand-2) 0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stars.lg{font-size:20px}
+
+/* ============================================================
+   LISTING PAGE
+   ============================================================ */
+.crumbs{font-size:13.5px;color:var(--ink-2);padding-top:22px}
+.crumbs ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.crumbs li+li::before{content:"/";margin-right:6px;color:var(--line)}
+.crumbs a{text-decoration:none}
+.crumbs a:hover{color:var(--ink);text-decoration:underline}
+.crumbs [aria-current]{color:var(--ink);font-weight:500}
+.page-head{padding-top:18px;padding-bottom:22px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.page-head h1{font-size:clamp(38px,5.4vw,76px)}
+.page-head p{margin:12px 0 0;max-width:56ch;color:var(--ink-2);font-size:17px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:22px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid var(--line);border-radius:var(--pill);text-decoration:none;font-size:14px;font-weight:500;background:var(--white)}
+.chip:hover{border-color:var(--ink)}
+.chip.is-active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip .n{font-size:12px;opacity:.6}
+.listing{display:grid;grid-template-columns:250px 1fr;gap:36px;align-items:start;padding-bottom:80px}
+.filters{position:sticky;top:96px;display:flex;flex-direction:column;gap:6px}
+.filters-head{display:none}
+.fgroup{border-top:1px solid var(--line);padding:16px 0}
+.fgroup h3{font-size:15px;font-weight:700;margin-bottom:12px}
+.check{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:14.5px;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--pine)}
+.check .n{margin-left:auto;color:var(--ink-2);font-size:13px}
+.range-vals{display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-bottom:10px}
+.range-dual{position:relative;height:28px}
+.range-dual input{position:absolute;left:0;right:0;width:100%;top:6px;margin:0;pointer-events:none;-webkit-appearance:none;appearance:none;background:none;height:16px}
+.range-dual input::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--ink);border:3px solid var(--paper);box-shadow:0 0 0 1px var(--ink);cursor:pointer}
+.range-dual input::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;background:var(--ink);border:3px solid var(--paper);box-shadow:0 0 0 1px var(--ink);cursor:pointer}
+.range-track{position:absolute;left:0;right:0;top:13px;height:3px;border-radius:2px;background:var(--line)}
+.range-fill{position:absolute;top:13px;height:3px;background:var(--pine);border-radius:2px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.toolbar .count{font-size:14.5px;color:var(--ink-2)}
+.toolbar select{height:42px;border-radius:var(--pill);border:1px solid var(--line);background:var(--white);padding:0 38px 0 16px;font-size:14.5px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23272725' stroke-width='1.6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.filter-toggle{display:none}
+.active-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.active-pills:empty{display:none}
+.active-pills button{border:0;background:var(--sage);border-radius:var(--pill);padding:6px 12px;font-size:13px;font-weight:500}
+.active-pills button:hover{background:var(--sand-2)}
+.empty{text-align:center;padding:64px 20px;background:var(--sand);border-radius:var(--r-l)}
+.empty h2,.empty h3{font-stretch:115%;font-size:24px;margin-bottom:8px}
+.empty p{color:var(--ink-2);margin:0 auto 22px;max-width:46ch}
+
+/* ============================================================
+   PRODUCT PAGE
+   ============================================================ */
+.pdp{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(28px,4vw,64px);padding-top:20px;padding-bottom:64px;align-items:start}
+.pdp-media{position:sticky;top:96px}
+.zoom{border-radius:var(--r-l);overflow:hidden;background:var(--sand);aspect-ratio:4/5;cursor:zoom-in;position:relative}
+.zoom img{width:100%;height:100%;object-fit:cover;transition:transform .25s ease-out}
+.zoom.is-zoomed img{transform:scale(1.9)}
+.zoom-hint{position:absolute;bottom:12px;left:12px;background:rgba(250,248,244,.9);font-size:12.5px;padding:5px 10px;border-radius:var(--pill)}
+.pdp-info .sub-link{font-size:14px;color:var(--pine);font-weight:600;text-decoration:none}
+.pdp-info h1{font-stretch:118%;font-size:clamp(30px,3.4vw,46px);letter-spacing:-.02em;line-height:1.05;margin:10px 0 12px}
+.pdp-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--ink-2)}
+.pdp-meta a{color:inherit}
+.pdp-price{font-size:26px;margin:20px 0 4px}
+.tax-note{font-size:13px;color:var(--ink-2);margin:0 0 20px}
+.pdp-desc{font-size:16.5px;line-height:1.65;color:var(--ink-2);max-width:56ch;margin:0 0 24px}
+.stock{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600}
+.stock::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--pine)}
+.stock.low::before{background:var(--marigold)}
+.stock.out::before{background:var(--danger)}
+.buybox{display:flex;flex-direction:column;gap:20px;padding:22px 0;border-top:1px solid var(--line)}
+.buybox fieldset{border:0;margin:0;padding:0}
+.buybox legend{font-size:14.5px;font-weight:600;margin-bottom:10px;display:flex;gap:6px;width:100%}
+.legend-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.legend-row legend{margin:0;width:auto}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.swatch{width:36px;height:36px;border-radius:50%;border:1px solid rgba(0,0,0,.15);background:var(--c);box-shadow:0 0 0 3px var(--paper);transition:box-shadow .15s}
+.swatch[aria-pressed="true"]{box-shadow:0 0 0 3px var(--paper),0 0 0 5px var(--ink)}
+.sizes{display:flex;gap:8px;flex-wrap:wrap}
+.size{min-width:52px;height:44px;padding:0 12px;border:1px solid var(--line);background:var(--white);border-radius:10px;font-weight:600;font-size:14.5px}
+.size:hover:not([disabled]){border-color:var(--ink)}
+.size[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.size[disabled]{opacity:.4;text-decoration:line-through;cursor:not-allowed}
+.field-error{color:var(--danger);font-size:13.5px;margin:8px 0 0;font-weight:500}
+.field-error[hidden]{display:none}
+.buy-row{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:var(--pill);background:var(--white);height:50px}
+.qty button{width:44px;height:100%;border:0;background:none;font-size:18px;border-radius:var(--pill)}
+.qty button:hover{background:var(--sand)}
+.qty span{min-width:28px;text-align:center;font-weight:600}
+.qty.sm{height:36px}
+.qty.sm button{width:34px;font-size:16px}
+.buy-row .btn-primary{flex:1;min-width:180px;height:50px}
+.wish-lg{width:50px;height:50px;border-radius:50%;border:1px solid var(--line);background:var(--white);display:grid;place-items:center}
+.wish-lg svg{width:21px;height:21px}
+.wish-lg[aria-pressed="true"] svg{fill:var(--marigold);stroke:var(--marigold)}
+.perks{display:grid;gap:10px;font-size:14px;color:var(--ink-2);background:var(--sand);border-radius:var(--r-m);padding:16px 18px;margin-top:4px}
+.perks div{display:flex;gap:10px;align-items:flex-start}
+.perks svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--pine)}
+.acc{border-top:1px solid var(--line)}
+.acc:last-child{border-bottom:1px solid var(--line)}
+.acc summary{list-style:none;padding:18px 0;font-weight:600;display:flex;justify-content:space-between;cursor:pointer}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary::after{content:"+";font-size:20px;line-height:1;font-weight:400}
+.acc[open] summary::after{content:"−"}
+.acc .acc-body{padding:0 0 20px;color:var(--ink-2);font-size:15px}
+.acc ul{margin:0;padding-left:18px}
+.acc li{margin:4px 0}
+
+.reviews{display:grid;grid-template-columns:300px 1fr;gap:48px;align-items:start}
+.rev-summary{background:var(--sand);border-radius:var(--r-m);padding:24px}
+.rev-avg{font-stretch:125%;font-weight:800;font-size:56px;letter-spacing:-.03em;line-height:1}
+.bars{display:grid;gap:6px;margin:18px 0 20px}
+.bar{display:grid;grid-template-columns:28px 1fr 40px;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+.bar i{display:block;height:6px;border-radius:3px;background:var(--sand-2);overflow:hidden}
+.bar i b{display:block;height:100%;background:var(--marigold)}
+.rev-list{display:grid;gap:0}
+.rev{padding:22px 0;border-bottom:1px solid var(--line)}
+.rev:first-child{padding-top:0}
+.rev h4{font-size:16px;margin:8px 0 6px}
+.rev p{margin:0;color:var(--ink-2)}
+.rev .who{font-size:13.5px;color:var(--ink-2);margin-top:10px}
+.rev .verified{color:var(--pine);font-weight:600}
+.rev-form{display:grid;gap:12px;margin-top:8px}
+.rev-form[hidden]{display:none}
+.star-input{display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:2px}
+.star-input input{position:absolute;opacity:0;pointer-events:none}
+.star-input label{font-size:26px;color:var(--sand-2);cursor:pointer;line-height:1}
+.star-input label:hover,.star-input label:hover~label,.star-input input:checked~label{color:var(--marigold)}
+.star-input input:focus-visible+label{outline:2px solid var(--marigold);border-radius:4px}
+
+/* ---------- Forms ---------- */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:14px;font-weight:600}
+.field input,.field select,.field textarea{height:48px;border:1px solid var(--line);border-radius:10px;background:var(--white);padding:0 14px;font-size:15.5px}
+.field textarea{height:auto;min-height:110px;padding:12px 14px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--ink)}
+.field [aria-invalid="true"]{border-color:var(--danger);background:#FDF6F3}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-grid .full{grid-column:1/-1}
+.hint{font-size:13px;color:var(--ink-2)}
+
+/* ============================================================
+   CHECKOUT
+   ============================================================ */
+.checkout{display:grid;grid-template-columns:1fr 400px;gap:40px;align-items:start;padding-top:20px;padding-bottom:80px}
+.steps{display:flex;gap:0;list-style:none;margin:0 0 28px;padding:0;counter-reset:s}
+.steps li{flex:1;display:flex;align-items:center;gap:10px;font-size:14.5px;font-weight:600;color:var(--ink-2);counter-increment:s;padding-bottom:12px;border-bottom:2px solid var(--line)}
+.steps li::before{content:counter(s);width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--sand);font-size:13px}
+.steps li.is-current{color:var(--ink);border-color:var(--ink)}
+.steps li.is-current::before{background:var(--ink);color:var(--paper)}
+.steps li.is-done{color:var(--pine);border-color:var(--pine)}
+.steps li.is-done::before{content:"✓";background:var(--pine);color:var(--paper)}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:var(--r-l);padding:clamp(20px,3vw,32px)}
+.panel h2{font-stretch:115%;font-size:24px;margin-bottom:6px}
+.panel>p.muted{margin:0 0 22px}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border:1px solid var(--line);border-radius:var(--r-m);cursor:pointer}
+.opt:has(input:checked){border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.opt input{margin-top:4px;accent-color:var(--pine);width:18px;height:18px}
+.opt strong{display:block}
+.opt .opt-price{margin-left:auto;font-weight:600;white-space:nowrap}
+.demo-note{background:var(--marigold-soft);color:#6b4517;border-radius:10px;padding:12px 14px;font-size:14px;margin:18px 0}
+.ck-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:26px;flex-wrap:wrap}
+.review-block{background:var(--sand);border-radius:var(--r-m);padding:14px 16px;font-size:14.5px;margin-bottom:12px;display:flex;justify-content:space-between;gap:12px}
+.review-block p{margin:2px 0 0;color:var(--ink-2)}
+.summary{position:sticky;top:96px;background:var(--sand);border-radius:var(--r-l);padding:24px}
+.summary h2{font-stretch:115%;font-size:20px;margin-bottom:16px}
+.sum-items{display:grid;gap:14px;max-height:320px;overflow:auto;padding-right:4px}
+.sum-item{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;font-size:14px}
+.sum-item img{width:56px;height:70px;object-fit:cover;border-radius:8px;background:var(--sand-2)}
+.sum-item .q{display:block;color:var(--ink-2);font-size:13px}
+.sum-lines{border-top:1px solid var(--line);margin-top:18px;padding-top:16px;display:grid;gap:8px;font-size:14.5px}
+.sum-lines div{display:flex;justify-content:space-between}
+.sum-lines .total{font-size:18px;font-weight:700;border-top:1px solid var(--line);padding-top:12px;margin-top:6px}
+.sum-lines .save{color:var(--pine);font-weight:600}
+.coupon{display:flex;gap:8px;margin-top:18px}
+.coupon input{flex:1;min-width:0;height:44px;border:1px solid var(--line);border-radius:var(--pill);padding:0 16px;background:var(--white);text-transform:uppercase}
+.coupon .btn{padding:10px 18px}
+.coupon-msg{font-size:13.5px;margin:8px 0 0}
+.coupon-msg.ok{color:var(--pine);font-weight:600}
+.coupon-msg.err{color:var(--danger)}
+
+.confirm{max-width:760px;margin:0 auto;padding:48px var(--gut) 96px;text-align:center}
+.confirm .big-tick{width:72px;height:72px;border-radius:50%;background:var(--pine);color:var(--paper);display:grid;place-items:center;margin:0 auto 24px}
+.confirm h1{font-size:clamp(38px,5vw,64px)}
+.confirm .lede{font-size:18px;color:var(--ink-2);max-width:52ch;margin:16px auto 32px}
+.confirm .panel{text-align:left}
+.confirm dl{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 0 20px}
+.confirm dt{font-size:13px;color:var(--ink-2)}
+.confirm dd{margin:2px 0 0;font-weight:700}
+
+/* ============================================================
+   HELP / POLICY / WISHLIST
+   ============================================================ */
+.help-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding-bottom:80px}
+.contact-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px}
+.contact-card{background:var(--sand);border-radius:var(--r-m);padding:22px}
+.contact-card h3{font-size:16px;margin-bottom:6px}
+.contact-card p{margin:0;color:var(--ink-2);font-size:14.5px}
+.contact-card a{font-weight:600;color:var(--ink)}
+.policy{max-width:760px;padding-bottom:80px}
+.policy h2{font-stretch:112%;font-size:22px;margin:32px 0 10px}
+.policy p,.policy li{color:var(--ink-2);font-size:16.5px;line-height:1.7}
+.success-box{background:var(--sage);border-radius:var(--r-m);padding:18px 20px}
+.success-box strong{display:block;margin-bottom:4px}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer{background:var(--sand);margin-top:40px;padding:64px 0 28px;font-size:14.5px}
+.foot-grid{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:32px}
+.foot-grid h3{font-size:15px;margin-bottom:14px}
+.foot-grid ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.foot-grid a,.foot-grid button.link{color:var(--ink-2);text-decoration:none;background:none;border:0;padding:0;font-size:14.5px;text-align:left}
+.foot-grid a:hover,.foot-grid button.link:hover{color:var(--ink);text-decoration:underline}
+.foot-brand p{color:var(--ink-2);max-width:34ch;margin:14px 0 18px}
+.socials{display:flex;gap:8px}
+.socials a{width:40px;height:40px;border-radius:50%;background:var(--paper);display:grid;place-items:center;color:var(--ink)}
+.socials a:hover{background:var(--ink);color:var(--paper)}
+.socials svg{width:18px;height:18px}
+.foot-bottom{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:48px;padding-top:22px;color:var(--ink-2);font-size:13.5px}
+.pay-icons{display:flex;gap:8px;flex-wrap:wrap}
+.pay-icons span{border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:12px;font-weight:600;background:var(--paper)}
+
+/* ============================================================
+   OVERLAYS: backdrop, drawers, modals, toast
+   ============================================================ */
+.backdrop{position:fixed;inset:0;background:rgba(28,28,26,.45);z-index:90;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.backdrop.is-open{opacity:1;visibility:visible}
+.drawer{position:fixed;top:0;bottom:0;right:0;width:min(440px,100%);background:var(--paper);z-index:100;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1);visibility:hidden}
+.drawer.left{right:auto;left:0;transform:translateX(-100%)}
+.drawer.is-open{transform:none;visibility:visible}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line)}
+.drawer-head h2{font-stretch:115%;font-size:20px}
+.drawer-body{flex:1;overflow:auto;padding:16px 20px}
+.drawer-foot{border-top:1px solid var(--line);padding:18px 20px;display:grid;gap:12px;background:var(--white)}
+.ship-bar{font-size:13.5px}
+.ship-bar i{display:block;height:6px;background:var(--sand);border-radius:3px;margin-top:8px;overflow:hidden}
+.ship-bar b{display:block;height:100%;background:var(--pine);border-radius:3px;transition:width .4s}
+.cart-line{display:grid;grid-template-columns:84px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.cart-line img{width:84px;height:105px;object-fit:cover;border-radius:10px;background:var(--sand)}
+.cart-line h3{font-size:15px;line-height:1.3}
+.cart-line h3 a{text-decoration:none}
+.cart-line .var{font-size:13px;color:var(--ink-2);margin:3px 0 10px}
+.cart-line .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.remove{background:none;border:0;font-size:13px;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;padding:4px 0}
+.remove:hover{color:var(--danger)}
+.subtotal{display:flex;justify-content:space-between;font-weight:700;font-size:17px}
+.nav-drawer .drawer-body{padding:8px 20px}
+.mnav-group{border-bottom:1px solid var(--line)}
+.mnav-group summary,.mnav-group>a{display:flex;justify-content:space-between;padding:16px 0;font-weight:600;font-size:17px;list-style:none;text-decoration:none;cursor:pointer}
+.mnav-group summary::-webkit-details-marker{display:none}
+.mnav-group summary::after{content:"+";font-weight:400}
+.mnav-group[open] summary::after{content:"−"}
+.mnav-group ul{list-style:none;margin:0;padding:0 0 14px 0;display:grid;gap:10px}
+.mnav-group ul a{text-decoration:none;color:var(--ink-2)}
+
+.modal{position:fixed;inset:0;z-index:110;display:grid;place-items:center;padding:20px;visibility:hidden;pointer-events:none}
+.modal.is-open{visibility:visible;pointer-events:auto}
+.modal-box{position:relative;background:var(--paper);border-radius:var(--r-l);width:min(980px,100%);max-height:calc(100vh - 40px);overflow:auto;box-shadow:0 40px 80px -30px rgba(0,0,0,.5);opacity:0;transform:translateY(16px) scale(.98);transition:opacity .25s,transform .25s}
+.modal.is-open .modal-box{opacity:1;transform:none}
+.modal-box.sm{width:min(560px,100%)}
+.modal-box.md{width:min(720px,100%)}
+.modal-close{position:absolute;top:12px;right:12px;z-index:3;background:var(--paper)}
+.qv{display:grid;grid-template-columns:1fr 1fr}
+.qv-img{background:var(--sand);aspect-ratio:4/5}
+.qv-img img{width:100%;height:100%;object-fit:cover}
+.qv-info{padding:32px 28px;display:flex;flex-direction:column}
+.qv-info h2{font-stretch:115%;font-size:28px;letter-spacing:-.015em;line-height:1.1;margin:6px 0 8px}
+.qv-info .pdp-price{margin:14px 0 2px;font-size:22px}
+.qv-info .pdp-desc{font-size:15px;margin-bottom:0}
+.qv-info .buybox{padding-bottom:12px;margin-top:18px}
+.modal-pad{padding:32px}
+.modal-pad h2{font-stretch:115%;font-size:26px;margin-bottom:6px}
+.tabs{display:flex;gap:6px;margin:18px 0}
+.tabs button{border:1px solid var(--line);background:var(--white);border-radius:var(--pill);padding:8px 16px;font-weight:600;font-size:14px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+table.size-table{width:100%;border-collapse:collapse;font-size:14.5px}
+.size-table th,.size-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+.size-table th{font-weight:700;background:var(--sand)}
+.size-table tbody tr:hover{background:var(--white)}
+.promo-modal{display:grid;grid-template-columns:.9fr 1.1fr}
+.promo-modal .pm-img{background:var(--sand-2)}
+.promo-modal .pm-img img{width:100%;height:100%;object-fit:cover}
+.promo-modal .modal-pad{display:flex;flex-direction:column;justify-content:center;gap:4px}
+.promo-modal h2{font-size:34px;font-stretch:125%;font-weight:800;letter-spacing:-.025em;line-height:1}
+.promo-modal .field{margin:18px 0 10px}
+.code-reveal{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px dashed var(--pine);border-radius:10px;padding:12px 14px;margin:16px 0 10px;font-weight:800;font-size:22px;letter-spacing:.04em}
+
+.toasts{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:130;display:grid;gap:8px;width:min(440px,calc(100% - 32px))}
+.toast{background:var(--ink);color:var(--paper);border-radius:var(--r-m);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:14.5px;box-shadow:var(--shadow);animation:tIn .25s ease-out}
+.toast button{background:none;border:0;color:var(--marigold);font-weight:700;white-space:nowrap}
+@keyframes tIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- Data layer inspector ---------- */
+.dl-fab{position:fixed;left:16px;bottom:16px;z-index:80;background:var(--paper);border:1px solid var(--line);border-radius:var(--pill);padding:8px 14px;font-size:13px;font-weight:600;box-shadow:var(--shadow);display:flex;align-items:center;gap:8px}
+.dl-fab .logo-dot{width:8px;height:8px;box-shadow:none}
+.inspector{width:min(520px,100%)}
+.inspector .drawer-body{font-size:13px;padding:10px 14px}
+.ins-ev{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--white)}
+.ins-ev summary{padding:10px 12px;display:flex;justify-content:space-between;gap:10px;cursor:pointer;list-style:none}
+.ins-ev summary::-webkit-details-marker{display:none}
+.ins-ev summary b{color:var(--pine)}
+.ins-ev pre{margin:0;padding:12px;background:#22221f;color:#E9E4DA;font-size:12px;line-height:1.5;overflow:auto;max-height:340px;border-radius:0 0 10px 10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.ins-tools{display:flex;gap:8px;flex-wrap:wrap}
+.ins-tools input{flex:1;height:36px;border:1px solid var(--line);border-radius:var(--pill);padding:0 14px;font-size:13px;min-width:120px}
+.ins-tools button{height:36px;border:1px solid var(--line);background:var(--paper);border-radius:var(--pill);padding:0 14px;font-size:13px;font-weight:600}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:1180px){
+  .main-nav .nav-link{padding:10px 10px;font-size:14.5px}
+  .search input{width:180px}
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .foot-grid{grid-template-columns:1fr 1fr 1fr}
+  .foot-brand{grid-column:1/-1}
+  .scroller{grid-auto-columns:calc((100% - 2*16px)/3)}
+}
+@media (max-width:980px){
+  .menu-btn{display:inline-grid}
+  .main-nav{display:none}
+  .header-inner{grid-template-columns:auto 1fr auto auto;grid-template-areas:"menu logo wish cart" "search search search search";gap:4px 4px;padding-top:8px;padding-bottom:10px}
+  .menu-btn{grid-area:menu}
+  .logo{grid-area:logo;font-size:20px}
+  .header-actions{display:contents}
+  #wishLink{grid-area:wish}
+  #cartBtn{grid-area:cart}
+  .search{grid-area:search;width:100%}
+  .search input{width:100%}
+  .suggest{left:0;right:0;width:auto}
+  .hero-inner{grid-template-columns:1fr}
+  .autoreply{justify-self:start}
+  .collections{grid-template-columns:1fr 1fr;grid-template-rows:auto}
+  .coll{min-height:240px}
+  .coll:first-child{grid-row:auto;grid-column:span 2;min-height:320px}
+  .coll:nth-child(4){grid-column:auto}
+  .story,.newsletter{grid-template-columns:1fr}
+  .testis{grid-template-columns:1fr}
+  .listing{grid-template-columns:1fr}
+  .filter-toggle{display:inline-flex}
+  .filters{position:fixed;inset:0 auto 0 0;width:min(360px,100%);background:var(--paper);z-index:105;padding:0 20px 20px;overflow:auto;transform:translateX(-100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);visibility:hidden;top:0}
+  .filters.is-open{transform:none;visibility:visible}
+  .filters-head{display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--paper);padding:16px 0;z-index:1}
+  .filters-head h2{font-size:20px;font-stretch:115%}
+  .filters .show-results{display:flex}
+  .pdp{grid-template-columns:1fr}
+  .pdp-media{position:static}
+  .reviews{grid-template-columns:1fr}
+  .checkout{grid-template-columns:1fr}
+  .summary{position:static;order:-1}
+  .help-grid{grid-template-columns:1fr}
+  .contact-cards{grid-template-columns:1fr}
+  .qv{grid-template-columns:1fr}
+  .qv-img{aspect-ratio:16/11}
+  .promo-modal{grid-template-columns:1fr}
+  .promo-modal .pm-img{height:180px}
+}
+.filters .show-results{display:none}
+@media (max-width:640px){
+  .grid,.grid.cols-3{grid-template-columns:repeat(2,1fr);gap:24px 12px}
+  .scroller{grid-auto-columns:72%}
+  .card-actions{position:static;opacity:1;transform:none;grid-template-columns:1fr 1fr;padding:8px 0 0;background:none}
+  .card-media{aspect-ratio:4/5}
+  .card-wrap-actions{display:block}
+  .card-title{font-size:14.5px}
+  .collections{grid-template-columns:1fr}
+  .coll:first-child{grid-column:auto}
+  .values div{grid-template-columns:1fr;gap:2px}
+  .form-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .confirm dl{grid-template-columns:1fr}
+  .steps li{font-size:0;gap:0;justify-content:center}
+  .steps li::before{font-size:13px}
+  .announce button{display:none}
+  .sec-head{flex-direction:column;align-items:flex-start}
+  .dl-fab{bottom:12px;left:12px;padding:7px 11px}
+}
+/* Touch devices: card buttons always visible */
+@media (hover:none){
+  .card-actions{opacity:1;transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ===================== ANNOUNCEMENT BAR ===================== -->
+<div class="announce" role="region" aria-label="Offers">
+  <div class="wrap">
+    <button type="button" id="annPrev" aria-label="Previous offer">‹</button>
+    <p id="annText" aria-live="polite"></p>
+    <button type="button" id="annNext" aria-label="Next offer">›</button>
+  </div>
+</div>
+
+<!-- ===================== HEADER ===================== -->
+<header class="site-header">
+  <div class="wrap header-inner">
+    <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-controls="navDrawer" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+    </button>
+    <a class="logo" href="#/" aria-label="Out of Office home"><span class="logo-dot" aria-hidden="true"></span>Out of Office</a>
+    <nav class="main-nav" aria-label="Main"><ul id="mainNavList"></ul></nav>
+    <div class="header-actions">
+      <form class="search" id="searchForm" role="search" autocomplete="off">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <label for="searchInput" class="sr-only">Search products</label>
+        <input id="searchInput" type="search" placeholder="Search tees, bags, watches" aria-autocomplete="list" aria-controls="suggest">
+        <div class="suggest" id="suggest" hidden></div>
+      </form>
+      <a class="icon-btn" href="#/wishlist" aria-label="Wishlist" id="wishLink">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20s-7.5-4.6-9.2-9.4C1.7 7.2 4 4 7.3 4c2 0 3.5 1.1 4.7 2.7C13.2 5.1 14.7 4 16.7 4 20 4 22.3 7.2 21.2 10.6 19.5 15.4 12 20 12 20z"/></svg>
+        <span class="count-badge" id="wishCount" hidden>0</span>
+      </a>
+      <button class="icon-btn" type="button" id="cartBtn" aria-label="Open cart" aria-controls="cartDrawer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+        <span class="count-badge" id="cartCount" hidden>0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== MAIN (views render here) ===================== -->
+<main id="main" tabindex="-1"></main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="#/"><span class="logo-dot" aria-hidden="true"></span>Out of Office</a>
+        <p>Clothes, bags and small essentials for people who'd rather be somewhere else. Designed in Bengaluru, made across India.</p>
+        <div class="socials">
+          <a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+          <a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg></a>
+          <a href="https://www.pinterest.com/" target="_blank" rel="noopener" aria-label="Pinterest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M11 8.5c3-1 5 .7 4.6 3-.4 2.2-2.4 3.2-3.8 2.2M11.5 10l-2 9"/></svg></a>
+          <a href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <h3>Shop</h3>
+        <ul>
+          <li><a href="#/shop/men">Men</a></li>
+          <li><a href="#/shop/women">Women</a></li>
+          <li><a href="#/shop/accessories">Accessories</a></li>
+          <li><a href="#/shop/bags">Bags &amp; Travel</a></li>
+          <li><a href="#/sale">Sale</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Customer support</h3>
+        <ul>
+          <li><a href="#/help">Help centre</a></li>
+          <li><a href="#/help?section=track">Track your order</a></li>
+          <li><button class="link" type="button" data-size-guide>Size guide</button></li>
+          <li><a href="#/help?section=contact">Contact us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Policies</h3>
+        <ul>
+          <li><a href="#/policy/shipping">Shipping</a></li>
+          <li><a href="#/policy/returns">Returns &amp; exchanges</a></li>
+          <li><a href="#/policy/privacy">Privacy</a></li>
+          <li><a href="#/policy/terms">Terms of use</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>For analysts</h3>
+        <ul>
+          <li><button class="link" type="button" data-open-inspector>Data layer inspector</button></li>
+          <li><button class="link" type="button" id="resetDemo">Reset demo data</button></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span id="year"></span> Out of Office. A demo store, no real orders are placed.</span>
+      <div class="pay-icons" aria-label="Accepted payments"><span>UPI</span><span>Visa</span><span>Mastercard</span><span>RuPay</span><span>Cash on delivery</span></div>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== OVERLAYS ===================== -->
+<div class="backdrop" id="backdrop"></div>
+
+<aside class="drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle" aria-hidden="true">
+  <div class="drawer-head"><h2 id="cartTitle">Your cart</h2>
+    <button class="icon-btn" type="button" data-close aria-label="Close cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="drawer-body" id="cartBody"></div>
+  <div class="drawer-foot" id="cartFoot"></div>
+</aside>
+
+<aside class="drawer left nav-drawer" id="navDrawer" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden="true">
+  <div class="drawer-head"><a class="logo" href="#/"><span class="logo-dot" aria-hidden="true"></span>Out of Office</a>
+    <button class="icon-btn" type="button" data-close aria-label="Close menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="drawer-body" id="mobileNav"></div>
+</aside>
+
+<aside class="drawer inspector" id="inspector" role="dialog" aria-modal="true" aria-labelledby="insTitle" aria-hidden="true">
+  <div class="drawer-head"><div><h2 id="insTitle">oooDataLayer</h2><p class="tiny muted" style="margin:2px 0 0">Newest first. Also logged to the browser console.</p></div>
+    <button class="icon-btn" type="button" data-close aria-label="Close inspector"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="drawer-foot" style="border-top:0;border-bottom:1px solid var(--line)">
+    <div class="ins-tools">
+      <label for="insFilter" class="sr-only">Filter events</label>
+      <input id="insFilter" placeholder="Filter by event name">
+      <button type="button" id="insCopy">Copy JSON</button>
+      <button type="button" id="insConsole">Log table</button>
+    </div>
+  </div>
+  <div class="drawer-body" id="insList"></div>
+</aside>
+<button class="dl-fab" type="button" data-open-inspector aria-label="Open data layer inspector"><span class="logo-dot"></span>Data layer <span id="dlCount">0</span></button>
+
+<div class="modal" id="qvModal" role="dialog" aria-modal="true" aria-label="Quick view" aria-hidden="true">
+  <div class="modal-box">
+    <button class="icon-btn modal-close" type="button" data-close aria-label="Close quick view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div id="qvContent"></div>
+  </div>
+</div>
+
+<div class="modal" id="sizeModal" role="dialog" aria-modal="true" aria-labelledby="sizeTitle" aria-hidden="true">
+  <div class="modal-box md">
+    <button class="icon-btn modal-close" type="button" data-close aria-label="Close size guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="modal-pad" id="sizeContent"></div>
+  </div>
+</div>
+
+<div class="modal" id="promoModal" role="dialog" aria-modal="true" aria-labelledby="promoTitle" aria-hidden="true">
+  <div class="modal-box md">
+    <button class="icon-btn modal-close" type="button" data-close aria-label="Close offer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="promo-modal">
+      <div class="pm-img"><img src="https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&w=700&q=75" alt="Packed bag with passport and camera"></div>
+      <div class="modal-pad" id="promoContent"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+/* ======================================================================
+   OUT OF OFFICE — application script
+   Sections:
+     1. Storage helpers (localStorage with in-memory fallback)
+     2. Data layer (window.oooDataLayer) + tracking helpers
+     3. Catalogue data
+     4. State (cart, wishlist, recently viewed …)
+     5. Rendering helpers (cards, prices, stars)
+     6. Views / router (home, listing, product, wishlist, checkout …)
+     7. Cart, wishlist, quick view, modals
+     8. Global event delegation
+     9. Boot
+   ====================================================================== */
+(function () {
+'use strict';
+
+/* ----------------------------------------------------------------------
+   1. STORAGE
+   localStorage keeps the cart, wishlist and recently viewed items between
+   refreshes. If storage is blocked (private mode, sandboxed previews) we
+   fall back to memory so the site still works.
+   ---------------------------------------------------------------------- */
+function makeStore(kind) {
+  let backend = null; const mem = {};
+  try { const s = window[kind]; s.setItem('__ooo', '1'); s.removeItem('__ooo'); backend = s; } catch (e) { backend = null; }
+  return {
+    get(k, d) { try { const v = backend ? backend.getItem(k) : mem[k]; return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { const s = JSON.stringify(v); try { backend ? backend.setItem(k, s) : (mem[k] = s); } catch (e) { mem[k] = s; } },
+    remove(k) { try { backend ? backend.removeItem(k) : delete mem[k]; } catch (e) { delete mem[k]; } }
+  };
+}
+const store = makeStore('localStorage');
+const session = makeStore('sessionStorage');
+
+/* ----------------------------------------------------------------------
+   Small utilities
+   ---------------------------------------------------------------------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const fmt = n => '₹' + Math.round(n).toLocaleString('en-IN');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = (p = '') => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const hash = s => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+/* ----------------------------------------------------------------------
+   2. DATA LAYER
+   ----------------------------------------------------------------------
+   window.oooDataLayer is a plain array. Every object pushed into it:
+     • is appended to the array (so Adobe Tags can read history on load)
+     • dispatches window CustomEvent "ooo:datalayer" (event.detail = object)
+     • is logged to the console (toggle with oooDebug(true|false))
+
+   Consistent event shape:
+   {
+     event:      "add_to_cart",
+     event_id:   "evt_…",
+     timestamp:  "2026-11-06T10:15:00.000Z",
+     page:       { page_name, page_type, site_section, sub_section, page_url, page_path, page_title, referrer, language },
+     user:       { visitor_id, login_status, newsletter_subscriber },
+     cart:       { cart_value, cart_quantity, line_items, currency },
+     ecommerce:  { currency:"INR", value, items:[…], …event specific },
+     search / newsletter / interaction: { … }   (only where relevant)
+   }
+
+   Item shape (inside ecommerce.items):
+   { item_id, item_name, item_brand, item_category, item_category2,
+     item_variant, item_colour, item_size, price, original_price,
+     discount, quantity, item_list_id, item_list_name, index }
+   ---------------------------------------------------------------------- */
+window.oooDataLayer = window.oooDataLayer || [];
+const DL_ARRAY = window.oooDataLayer;
+let DL_DEBUG = store.get('ooo_debug', true);
+const nativePush = Array.prototype.push;
+
+// Wrap push so ANY push (ours or a manual one from the console) is broadcast.
+DL_ARRAY.push = function () {
+  const result = nativePush.apply(this, arguments);
+  for (let i = 0; i < arguments.length; i++) {
+    const obj = arguments[i];
+    try { window.dispatchEvent(new CustomEvent('ooo:datalayer', { detail: obj })); } catch (e) {}
+    if (DL_DEBUG && obj && obj.event) {
+      console.groupCollapsed('%c oooDataLayer %c ' + obj.event, 'background:#4D5B47;color:#FAF8F4;border-radius:3px;padding:1px 4px', 'color:#D4852F;font-weight:bold');
+      console.log(obj);
+      console.groupEnd();
+    }
+    inspectorAdd(obj);
+  }
+  return result;
+};
+
+// Helpers attached to the array for use in Adobe Tags data elements / console.
+DL_ARRAY.getLatest = function (eventName) {
+  for (let i = this.length - 1; i >= 0; i--) if (!eventName || this[i].event === eventName) return this[i];
+  return null;
+};
+DL_ARRAY.getState = function () {
+  return { page: pageContext(), user: userContext(), cart: cartContext(), cart_items: state.cart.map(l => lineItem(l)) };
+};
+
+// Console helpers: oooDebug() prints a table; oooDebug(false) mutes logging.
+window.oooDebug = function (on) {
+  if (typeof on === 'boolean') { DL_DEBUG = on; store.set('ooo_debug', on); console.info('oooDataLayer console logging ' + (on ? 'on' : 'off')); return; }
+  console.table(DL_ARRAY.map(e => ({ event: e.event, time: e.timestamp, page: e.page && e.page.page_name, value: e.ecommerce && e.ecommerce.value, items: e.ecommerce && e.ecommerce.items ? e.ecommerce.items.length : '' })));
+  return DL_ARRAY;
+};
+
+let PAGE = { name: 'ooo:home', type: 'home', section: 'home', sub: '' };
+
+function pageContext() {
+  return {
+    page_name: PAGE.name,
+    page_type: PAGE.type,
+    site_section: PAGE.section,
+    sub_section: PAGE.sub || '',
+    page_url: location.href,
+    page_path: location.pathname + location.hash,
+    page_title: document.title,
+    referrer: document.referrer || '',
+    language: 'en-IN'
+  };
+}
+function userContext() {
+  return { visitor_id: state.visitorId, login_status: 'guest', newsletter_subscriber: !!state.subscribed };
+}
+function cartContext() {
+  const t = cartTotals();
+  return { cart_value: t.subtotal, cart_quantity: t.count, line_items: state.cart.length, currency: 'INR' };
+}
+
+/**
+ * track(eventName, payload)
+ * The single function every interaction uses to write to oooDataLayer.
+ * Adds event_id, timestamp, page, user and cart context automatically.
+ */
+function track(event, payload) {
+  const obj = Object.assign({
+    event: event,
+    event_id: uid('evt_'),
+    timestamp: new Date().toISOString(),
+    page: pageContext(),
+    user: userContext(),
+    cart: cartContext()
+  }, payload || {});
+  DL_ARRAY.push(obj);
+  return obj;
+}
+
+/** Map a product (+ optional variant/quantity/list info) to a data-layer item. */
+function dlItem(p, extra) {
+  extra = extra || {};
+  const colour = extra.colour || null, size = extra.size || null;
+  const item = {
+    item_id: p.id,
+    item_name: p.name,
+    item_brand: 'Out of Office',
+    item_category: CATS[p.cat].label,
+    item_category2: CATS[p.cat].subs[p.sub],
+    item_variant: [colour, size].filter(Boolean).join(' / ') || null,
+    item_colour: colour,
+    item_size: size,
+    price: p.price,
+    original_price: p.mrp || p.price,
+    discount: p.mrp ? p.mrp - p.price : 0,
+    quantity: extra.quantity || 1,
+    in_stock: p.stock > 0
+  };
+  if (extra.listId) item.item_list_id = extra.listId;
+  if (extra.listName) item.item_list_name = extra.listName;
+  if (extra.index) item.index = extra.index;
+  return item;
+}
+function lineItem(line, extra) {
+  return dlItem(P_BY_ID[line.id], Object.assign({ colour: line.colour, size: line.size, quantity: line.qty }, extra || {}));
+}
+
+/* ----------------------------------------------------------------------
+   3. CATALOGUE
+   ---------------------------------------------------------------------- */
+const IMG = (id, w) => 'https://images.unsplash.com/photo-' + id + '?auto=format&fit=crop&w=' + (w || 800) + '&q=75';
+
+const CATS = {
+  men: { label: 'Men', blurb: 'Breathable layers that look right in a meeting and better on a sleeper train.', img: IMG('1617137968427-85924c800a22', 1000),
+    subs: { tshirts: 'T-shirts', shirts: 'Shirts', trousers: 'Trousers', shorts: 'Shorts', hoodies: 'Hoodies', activewear: 'Activewear' } },
+  women: { label: 'Women', blurb: 'Easy dresses, packable jackets and pieces that move between climates.', img: IMG('1515886657613-9f3515b0c78f', 1000),
+    subs: { tops: 'Tops', dresses: 'Dresses', trousers: 'Trousers', activewear: 'Activewear', jackets: 'Jackets', casualwear: 'Casualwear' } },
+  accessories: { label: 'Accessories', blurb: 'Watches, caps, sunglasses and the small things you always forget to pack.', img: IMG('1523275335684-37898b6baf30', 1000),
+    subs: { watches: 'Watches', caps: 'Caps', sunglasses: 'Sunglasses', wallets: 'Wallets', bottles: 'Water bottles' } },
+  bags: { label: 'Bags & Travel', blurb: 'Backpacks, duffels and travel kit tested in overhead lockers across the country.', img: IMG('1553062407-98eeb64c6a62', 1000),
+    subs: { backpacks: 'Backpacks', duffels: 'Duffel bags', slings: 'Sling bags', 'travel-accessories': 'Travel accessories' } }
+};
+
+const COLOURS = {
+  Chalk: '#EFEBE3', Charcoal: '#3A3A37', Olive: '#6B7157', Sand: '#D6C4A3', Navy: '#2F3A4F', Rust: '#B0612E', Sage: '#A5AF95',
+  Black: '#232321', White: '#F7F6F2', Stone: '#B8B1A4', Indigo: '#3F4B6B', Clay: '#BF8A64', Forest: '#3E5242', Tan: '#B48857',
+  Brown: '#6A4A35', Marigold: '#D4852F', Sky: '#9DB4C8', Mauve: '#9C7E85', Silver: '#C9CBCC', Ecru: '#E9E0CC', Tortoise: '#7A4E2D'
+};
+
+const MEN_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
+const WOMEN_SIZES = ['XS', 'S', 'M', 'L', 'XL'];
+const WAIST = ['28', '30', '32', '34', '36'];
+
+/* 28 demo products. Prices in INR. mrp = original price when on sale. */
+const PRODUCTS = [
+  { id: 'OOO-M-TS-001', name: 'Layover Organic Cotton Tee', cat: 'men', sub: 'tshirts', price: 1299, sizes: MEN_SIZES, colours: ['Chalk', 'Charcoal', 'Olive'], rating: 4.7, reviews: 214, stock: 48, tags: ['bestseller'], img: IMG('1521572163474-6864f9cf17ab'),
+    desc: 'A mid-weight organic cotton tee that survives a red-eye and still looks good at breakfast. Pre-shrunk, softly structured and cut slightly relaxed.',
+    details: ['100% GOTS-certified organic cotton, 180 GSM', 'Relaxed fit, true to size', 'Machine wash cold, line dry', 'Knitted and sewn in Tiruppur'] },
+  { id: 'OOO-M-TS-002', name: 'Field Notes Pocket Tee', cat: 'men', sub: 'tshirts', price: 1049, mrp: 1499, sizes: MEN_SIZES, soldOut: ['XXL'], colours: ['Sand', 'Navy'], rating: 4.4, reviews: 96, stock: 22, tags: ['trending'], img: IMG('1576566588028-4147f3842f27'),
+    desc: 'Slub cotton with a chest pocket big enough for a boarding pass. Garment-dyed so every one fades a little differently.',
+    details: ['100% slub cotton, garment dyed', 'Regular fit', 'Reinforced pocket seams', 'Wash inside out'] },
+  { id: 'OOO-M-SH-001', name: 'Linen Camp-Collar Shirt', cat: 'men', sub: 'shirts', price: 2799, sizes: MEN_SIZES, colours: ['Ecru', 'Sage', 'Rust'], rating: 4.8, reviews: 131, stock: 30, tags: ['new', 'bestseller'], img: IMG('1596755094514-f87e34085b2c'),
+    desc: 'Pure European flax linen with an open camp collar. Breathes in 38°C humidity and looks deliberately rumpled rather than slept in.',
+    details: ['100% European flax linen', 'Boxy, slightly cropped fit', 'Coconut-shell buttons, spare included', 'Woven and finished in Jaipur'] },
+  { id: 'OOO-M-SH-002', name: 'Overland Oxford Shirt', cat: 'men', sub: 'shirts', price: 2499, sizes: MEN_SIZES, colours: ['Sky', 'White'], rating: 4.5, reviews: 88, stock: 4, tags: [], img: IMG('1602810318383-e386cc2a3ccf'),
+    desc: 'A button-down oxford with a touch of stretch, so you can lift a bag into the overhead bin without a seam complaining.',
+    details: ['97% cotton, 3% elastane oxford weave', 'Tailored fit', 'Button-down collar', 'Wrinkle-resistant finish'] },
+  { id: 'OOO-M-TR-001', name: 'Transit Stretch Chinos', cat: 'men', sub: 'trousers', price: 2999, sizes: WAIST, colours: ['Stone', 'Olive', 'Navy'], rating: 4.6, reviews: 302, stock: 55, tags: ['bestseller'], img: IMG('1473966968600-fa801b869a1a'),
+    desc: 'Our most-reordered trouser. Four-way stretch twill, a hidden zip pocket for your phone and a tapered leg that works with sneakers or loafers.',
+    details: ['98% cotton, 2% elastane twill', 'Slim-tapered fit, mid rise', 'Hidden zip security pocket', 'Inseam 31"'] },
+  { id: 'OOO-M-SR-001', name: 'Shoreline Quick-Dry Shorts', cat: 'men', sub: 'shorts', price: 1599, mrp: 2299, sizes: MEN_SIZES, colours: ['Navy', 'Sand', 'Forest'], rating: 4.3, reviews: 74, stock: 18, tags: [], img: IMG('1591195853828-11db59a44f6b'),
+    desc: 'Swim-ready shorts that dry before you reach the beach shack. Mesh lining, a key loop and a 7" inseam.',
+    details: ['Recycled polyester with DWR finish', '7" inseam', 'Mesh brief lining', 'Zip back pocket'] },
+  { id: 'OOO-M-HD-001', name: 'Basecamp Heavyweight Hoodie', cat: 'men', sub: 'hoodies', price: 3499, sizes: MEN_SIZES, colours: ['Charcoal', 'Olive', 'Ecru'], rating: 4.9, reviews: 187, stock: 26, tags: ['trending', 'bestseller'], img: IMG('1556821840-3a63f95609a7'),
+    desc: 'Brushed-back 400 GSM fleece for cold Manali mornings and over-air-conditioned offices. The hood actually stays up.',
+    details: ['80% cotton, 20% recycled polyester, 400 GSM', 'Relaxed fit', 'Double-layer hood, no drawcords', 'Kangaroo pocket with hidden phone sleeve'] },
+  { id: 'OOO-M-AW-001', name: 'Trailhead Training Tee', cat: 'men', sub: 'activewear', price: 1599, sizes: MEN_SIZES, colours: ['Black', 'Forest'], rating: 4.4, reviews: 59, stock: 0, tags: [], img: IMG('1571019613454-1cb2f99b2d8b'),
+    desc: 'Lightweight, anti-odour performance tee for runs, climbs and the hotel gym. Restocking soon.',
+    details: ['Recycled polyester with silver-ion treatment', 'Athletic fit', 'Flatlock seams', 'UPF 30'] },
+
+  { id: 'OOO-W-TP-001', name: 'Sundeck Ribbed Tank', cat: 'women', sub: 'tops', price: 999, sizes: WOMEN_SIZES, colours: ['White', 'Black', 'Clay'], rating: 4.5, reviews: 142, stock: 60, tags: [], img: IMG('1503342217505-b0a15ec3261c'),
+    desc: 'A fine-rib tank with enough weight that it doesn\'t cling. Layers under shirts or stands on its own.',
+    details: ['95% cotton, 5% elastane rib', 'Fitted, hip length', 'Scoop neck', 'Machine wash cold'] },
+  { id: 'OOO-W-TP-002', name: 'Itinerary Boxy Linen Top', cat: 'women', sub: 'tops', price: 1899, sizes: WOMEN_SIZES, colours: ['Ecru', 'Sage'], rating: 4.6, reviews: 63, stock: 34, tags: ['new'], img: IMG('1434389677669-e08b4cac3105'),
+    desc: 'A cropped, boxy linen top with dropped shoulders. Tuck it into wide-leg trousers or wear it open over a tank.',
+    details: ['100% linen', 'Boxy, cropped fit', 'Side slits', 'Hand-finished hem'] },
+  { id: 'OOO-W-DR-001', name: 'Monsoon Midi Wrap Dress', cat: 'women', sub: 'dresses', price: 3299, sizes: WOMEN_SIZES, colours: ['Forest', 'Marigold', 'Black'], rating: 4.8, reviews: 256, stock: 21, tags: ['bestseller'], img: IMG('1595777457583-95e059d581b8'),
+    desc: 'A fluid wrap dress in quick-dry crepe that handles sudden rain and long-haul flights equally well. Adjustable tie waist.',
+    details: ['100% Tencel™ Lyocell crepe', 'True wrap, adjustable waist', 'Midi length, side pockets', 'Packs into its own pocket'] },
+  { id: 'OOO-W-DR-002', name: 'Riviera Shirt Dress', cat: 'women', sub: 'dresses', price: 2899, mrp: 3899, sizes: WOMEN_SIZES, soldOut: ['XS'], colours: ['Sky', 'White'], rating: 4.5, reviews: 91, stock: 12, tags: ['trending'], img: IMG('1572804013309-59a88b7e92f1'),
+    desc: 'Crisp cotton poplin, a removable belt and a hem that hits just below the knee. Works for brunch, sightseeing and dinner.',
+    details: ['100% cotton poplin', 'Relaxed fit with removable belt', 'Below-knee length', 'Mother-of-pearl buttons'] },
+  { id: 'OOO-W-TR-001', name: 'Wanderer Wide-Leg Trousers', cat: 'women', sub: 'trousers', price: 2699, sizes: WOMEN_SIZES, colours: ['Sand', 'Black', 'Olive'], rating: 4.7, reviews: 118, stock: 40, tags: [], img: IMG('1509631179647-0177331693ae'),
+    desc: 'High-rise, wide-leg trousers in a drapey twill that resists creases. Elastic back waist for long travel days.',
+    details: ['Lyocell-cotton twill', 'High rise, wide leg', 'Elastic back waistband', 'Full length, 30" inseam'] },
+  { id: 'OOO-W-AW-001', name: 'Ascent Seamless Leggings', cat: 'women', sub: 'activewear', price: 2199, sizes: WOMEN_SIZES, colours: ['Black', 'Forest', 'Mauve'], rating: 4.6, reviews: 205, stock: 3, tags: ['trending'], img: IMG('1518611012118-696072aa579a'),
+    desc: 'Squat-proof seamless knit with a high waistband that doesn\'t roll. Built for yoga at sunrise and a trek in the afternoon.',
+    details: ['Recycled nylon, elastane', 'High waist, 7/8 length', 'Sweat-wicking, quick-dry', 'Side drop-in pocket'] },
+  { id: 'OOO-W-JK-001', name: 'Weekender Utility Jacket', cat: 'women', sub: 'jackets', price: 4999, sizes: WOMEN_SIZES, colours: ['Olive', 'Sand'], rating: 4.7, reviews: 77, stock: 15, tags: ['new'], img: IMG('1591047139829-d91aecb6caea'),
+    desc: 'A lightweight cotton-canvas utility jacket with four front pockets. Water-repellent without the plasticky feel.',
+    details: ['Organic cotton canvas with PFC-free DWR', 'Relaxed fit, hip length', 'Four bellow pockets', 'Interior passport pocket'] },
+  { id: 'OOO-W-JK-002', name: 'Altitude Packable Puffer', cat: 'women', sub: 'jackets', price: 5999, mrp: 7499, sizes: WOMEN_SIZES, colours: ['Black', 'Clay'], rating: 4.8, reviews: 66, stock: 9, tags: [], img: IMG('1539109136881-3be0616acf4b'),
+    desc: 'Recycled synthetic insulation that stays warm when damp and packs down to the size of a water bottle.',
+    details: ['Recycled ripstop shell, synthetic fill', 'Packs into chest pocket', 'Warm to around −5°C', 'Two-way zip'] },
+  { id: 'OOO-W-CW-001', name: 'Slow Morning Knit Cardigan', cat: 'women', sub: 'casualwear', price: 2599, sizes: WOMEN_SIZES, colours: ['Ecru', 'Mauve'], rating: 4.5, reviews: 48, stock: 0, tags: [], img: IMG('1485968579580-b6d095142e6e'),
+    desc: 'A soft cotton-wool cardigan for chilly flights and hill-station evenings. Back in stock next month.',
+    details: ['70% cotton, 30% merino wool', 'Relaxed fit', 'Horn-effect buttons', 'Hand wash cold'] },
+
+  { id: 'OOO-A-WT-001', name: 'Timezone Field Watch', cat: 'accessories', sub: 'watches', price: 6999, sizes: [], colours: ['Silver', 'Black'], rating: 4.8, reviews: 133, stock: 14, tags: ['bestseller'], img: IMG('1524592094714-0f0654e20314'),
+    desc: 'A 38 mm field watch with a second time-zone bezel, so you always know what time it is back home.',
+    details: ['38 mm stainless steel case', 'Japanese quartz movement', 'Rotating GMT bezel', '100 m water resistance, quick-release strap'] },
+  { id: 'OOO-A-CP-001', name: 'Sunchaser Washed Cap', cat: 'accessories', sub: 'caps', price: 899, sizes: [], colours: ['Olive', 'Sand', 'Navy'], rating: 4.4, reviews: 167, stock: 70, tags: [], img: IMG('1588850561407-ed78c282e89b'),
+    desc: 'A soft, unstructured six-panel cap in washed cotton. Brass slider adjusts to fit.',
+    details: ['100% washed cotton twill', 'Unstructured, low profile', 'Adjustable brass buckle', 'One size'] },
+  { id: 'OOO-A-SG-001', name: 'Horizon Polarised Sunglasses', cat: 'accessories', sub: 'sunglasses', price: 2499, sizes: [], colours: ['Tortoise', 'Black'], rating: 4.6, reviews: 112, stock: 25, tags: ['trending'], img: IMG('1572635196237-14b3f281503f'),
+    desc: 'Lightweight acetate frames with polarised, UV400 lenses that cut glare on water, snow and highways.',
+    details: ['Bio-acetate frame', 'Polarised UV400 lenses', 'Spring hinges', 'Includes recycled-felt case'] },
+  { id: 'OOO-A-WL-001', name: 'Passport Leather Wallet', cat: 'accessories', sub: 'wallets', price: 1999, mrp: 2499, sizes: [], colours: ['Tan', 'Brown'], rating: 4.7, reviews: 89, stock: 31, tags: [], img: IMG('1627123424574-724758594e93'),
+    desc: 'Vegetable-tanned leather travel wallet that holds a passport, boarding pass, cards and a little foreign currency.',
+    details: ['Vegetable-tanned leather', 'RFID-blocking lining', '6 card slots, 2 note sleeves', 'Fits a standard Indian passport'] },
+  { id: 'OOO-A-WB-001', name: 'Refill Insulated Bottle 750 ml', cat: 'accessories', sub: 'bottles', price: 1299, sizes: [], colours: ['Sage', 'Charcoal', 'Marigold'], rating: 4.8, reviews: 241, stock: 80, tags: ['new'], img: IMG('1602143407151-7111542de6e8'),
+    desc: 'Double-walled steel bottle that keeps water cold for 24 hours and chai hot for 12. Leak-proof, fits most cup holders.',
+    details: ['18/8 stainless steel, vacuum insulated', '750 ml capacity', 'Leak-proof lid with carry loop', 'Hand wash only'] },
+
+  { id: 'OOO-B-BP-001', name: 'Commuter 22L Rolltop Backpack', cat: 'bags', sub: 'backpacks', price: 4499, sizes: [], colours: ['Black', 'Olive'], rating: 4.7, reviews: 198, stock: 20, tags: ['bestseller'], img: IMG('1622560480605-d83c853bc5c3'),
+    desc: 'A weatherproof rolltop with a padded 16" laptop sleeve and quick-access side zip. Expands from 18 to 22 litres.',
+    details: ['Recycled 600D polyester, TPU coated', '18–22 L capacity', 'Padded 16" laptop sleeve', 'Luggage pass-through strap'] },
+  { id: 'OOO-B-BP-002', name: 'Summit 30L Trek Pack', cat: 'bags', sub: 'backpacks', price: 5499, sizes: [], colours: ['Forest', 'Rust'], rating: 4.6, reviews: 84, stock: 11, tags: ['trending'], img: IMG('1551632811-561732d1e306'),
+    desc: 'A ventilated trekking pack with a hip belt, hydration sleeve and rain cover tucked in the base. Built for multi-day hikes.',
+    details: ['Ripstop nylon, 30 L', 'Ventilated mesh back panel', 'Integrated rain cover', 'Hydration-bladder compatible'] },
+  { id: 'OOO-B-DF-001', name: 'Long Weekend Duffel 40L', cat: 'bags', sub: 'duffels', price: 5999, sizes: [], colours: ['Tan', 'Black'], rating: 4.9, reviews: 156, stock: 17, tags: ['new', 'bestseller'], img: IMG('1547949003-9792a18a2601'),
+    desc: 'Three days of clothes, one pair of shoes, nothing extra. Cabin-size, with a separate shoe compartment and backpack straps.',
+    details: ['Waxed cotton canvas with leather trim', '40 L, cabin-size', 'Ventilated shoe compartment', 'Hideaway backpack straps'] },
+  { id: 'OOO-B-SL-001', name: 'Day Off Sling Bag', cat: 'bags', sub: 'slings', price: 1899, sizes: [], colours: ['Black', 'Sand', 'Sage'], rating: 4.5, reviews: 121, stock: 44, tags: [], img: IMG('1590874103328-eac38a683ce7'),
+    desc: 'A compact crossbody that fits a phone, wallet, power bank and passport, and sits flat against your body in crowds.',
+    details: ['Recycled nylon, water-resistant', '3 L capacity', 'Anti-theft back zip pocket', 'Adjustable strap'] },
+  { id: 'OOO-B-TA-001', name: 'Carry-On Packing Cube Set', cat: 'bags', sub: 'travel-accessories', price: 1499, mrp: 1999, sizes: [], colours: ['Sage', 'Charcoal'], rating: 4.7, reviews: 210, stock: 50, tags: ['trending'], img: IMG('1530521954074-e64f6810b32d'),
+    desc: 'Four compression cubes sized for a standard cabin bag. Mesh tops so you can see what\'s inside without unzipping.',
+    details: ['Set of 4: L, M, S, shoe pouch', 'Compression zips', 'Recycled ripstop with mesh panels', 'Machine washable'] },
+  { id: 'OOO-B-TA-002', name: 'Red-Eye Travel Comfort Kit', cat: 'bags', sub: 'travel-accessories', price: 1199, sizes: [], colours: ['Charcoal'], rating: 4.3, reviews: 57, stock: 5, tags: [], img: IMG('1488646953014-85cb44e25828'),
+    desc: 'Memory-foam neck pillow, contoured eye mask and foam earplugs in one zip pouch that clips to your bag.',
+    details: ['Memory-foam pillow with washable cover', 'Contoured blackout eye mask', 'Two pairs of earplugs', 'Clip-on carry pouch'] }
+];
+const P_BY_ID = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
+
+const COUPONS = {
+  WELCOME10: { pct: 10, min: 0, label: '10% off your first order' },
+  WEEKEND15: { pct: 15, min: 4999, label: '15% off orders over ₹4,999' }
+};
+const FREE_SHIP = 2999;
+
+const REVIEW_POOL = [
+  { n: 'Ananya R.', c: 'Pune', r: 5, t: 'Exactly what I was looking for', x: 'Took it on a 10-day trip through Rajasthan and it held up brilliantly. Washed it twice in a hotel sink and it still looks new.' },
+  { n: 'Karan S.', c: 'Gurugram', r: 5, t: 'Quality is genuinely good', x: 'You can feel the difference in the stitching and fabric. Worth the price, and delivery came a day early.' },
+  { n: 'Meera J.', c: 'Chennai', r: 4, t: 'Lovely, slightly roomy', x: 'Really like it overall. Runs a little relaxed, so check the size guide if you prefer a closer fit.' },
+  { n: 'Rohan D.', c: 'Bengaluru', r: 5, t: 'My go-to for travel', x: 'Packs small, doesn\'t wrinkle much and looks put-together. I\'ve already bought a second one.' },
+  { n: 'Ishita P.', c: 'Ahmedabad', r: 4, t: 'Great, one small thing', x: 'Love the colour and finish. The exchange for a different size was quick and the pickup was arranged within two days.' },
+  { n: 'Vikram N.', c: 'Hyderabad', r: 5, t: 'Survived Spiti', x: 'Dust, rain, cold mornings, bumpy roads. It came back looking like it had a good time, which is more than I can say for me.' },
+  { n: 'Fatima K.', c: 'Lucknow', r: 4, t: 'Nice everyday piece', x: 'Not flashy, just well made and comfortable. Packaging was plastic-free, which I appreciated.' },
+  { n: 'Dev A.', c: 'Kolkata', r: 3, t: 'Good, but not perfect', x: 'Does the job and feels sturdy. I wish there were more colour options, but no complaints about quality.' }
+];
+
+/* ----------------------------------------------------------------------
+   4. STATE
+   ---------------------------------------------------------------------- */
+const state = {
+  cart: store.get('ooo_cart', []).filter(l => P_BY_ID[l.id]),
+  wish: store.get('ooo_wishlist', []).filter(id => P_BY_ID[id]),
+  recent: store.get('ooo_recent', []).filter(id => P_BY_ID[id]),
+  coupon: store.get('ooo_coupon', null),
+  subscribed: store.get('ooo_subscribed', false),
+  userReviews: store.get('ooo_reviews', {}),
+  orders: store.get('ooo_orders', []),
+  visitorId: store.get('ooo_vid', null)
+};
+if (!state.visitorId) { state.visitorId = uid('v_'); store.set('ooo_vid', state.visitorId); }
+
+const saveCart = () => { store.set('ooo_cart', state.cart); updateBadges(); };
+const saveWish = () => { store.set('ooo_wishlist', state.wish); updateBadges(); };
+
+function cartTotals() {
+  let subtotal = 0, count = 0, mrp = 0;
+  state.cart.forEach(l => { const p = P_BY_ID[l.id]; if (!p) return; subtotal += p.price * l.qty; mrp += (p.mrp || p.price) * l.qty; count += l.qty; });
+  return { subtotal, count, savings: mrp - subtotal };
+}
+
+/* ----------------------------------------------------------------------
+   5. RENDER HELPERS
+   ---------------------------------------------------------------------- */
+const ICON = {
+  heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20s-7.5-4.6-9.2-9.4C1.7 7.2 4 4 7.3 4c2 0 3.5 1.1 4.7 2.7C13.2 5.1 14.7 4 16.7 4 20 4 22.3 7.2 21.2 10.6 19.5 15.4 12 20 12 20z"/></svg>',
+  left: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 5l-7 7 7 7"/></svg>',
+  right: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5l7 7-7 7"/></svg>',
+  truck: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
+  ret: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10h11a5 5 0 0 1 0 10H9"/><path d="M8 6l-4 4 4 4"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>',
+  check: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
+};
+
+const isSale = p => !!p.mrp && p.mrp > p.price;
+const pctOff = p => isSale(p) ? Math.round((1 - p.price / p.mrp) * 100) : 0;
+const inStock = p => p.stock > 0;
+const subLabel = p => CATS[p.cat].subs[p.sub];
+const stars = (r, cls) => '<span class="stars ' + (cls || '') + '" style="--r:' + r + '" role="img" aria-label="Rated ' + r + ' out of 5"></span>';
+
+function priceHTML(p) {
+  if (isSale(p)) return '<div class="price"><span>' + fmt(p.price) + '</span><s>' + fmt(p.mrp) + '</s><span class="off">' + pctOff(p) + '% off</span></div>';
+  return '<div class="price"><span>' + fmt(p.price) + '</span></div>';
+}
+function stockHTML(p) {
+  if (!inStock(p)) return '<span class="stock out">Sold out, restocking soon</span>';
+  if (p.stock <= 5) return '<span class="stock low">Only ' + p.stock + ' left</span>';
+  return '<span class="stock">In stock, ships in 24 hours</span>';
+}
+
+/** Product card used in every grid / scroller. The parent element carries data-list-id + data-list-name. */
+function card(p, i) {
+  const wished = state.wish.includes(p.id);
+  const badges = [];
+  if (!inStock(p)) badges.push('<span class="badge badge-out">Sold out</span>');
+  else if (isSale(p)) badges.push('<span class="badge badge-sale">−' + pctOff(p) + '%</span>');
+  if (p.tags.includes('new')) badges.push('<span class="badge badge-new">New</span>');
+  if (inStock(p) && p.stock <= 5) badges.push('<span class="badge">Only ' + p.stock + ' left</span>');
+  const sizePop = p.sizes.length ? '<div class="size-pop" hidden><p>Choose a size</p><div class="size-pop-grid">' +
+    p.sizes.map(s => '<button type="button" data-addsize="' + s + '"' + ((p.soldOut || []).includes(s) ? ' disabled aria-label="' + s + ', sold out"' : '') + '>' + s + '</button>').join('') +
+    '</div><button type="button" class="size-pop-close" data-sizepop-close aria-label="Close size picker">×</button></div>' : '';
+  return '<article class="card' + (inStock(p) ? '' : ' is-out') + '" data-id="' + p.id + '" data-index="' + (i + 1) + '">' +
+    '<div class="card-media">' +
+      '<a href="#/product/' + p.id + '" data-select tabindex="-1" aria-hidden="true"><img src="' + p.img + '" alt="' + esc(p.name) + '" loading="lazy"></a>' +
+      '<div class="badges">' + badges.join('') + '</div>' +
+      '<button type="button" class="wish-btn" data-wish="' + p.id + '" aria-pressed="' + wished + '" aria-label="' + (wished ? 'Remove ' : 'Add ') + esc(p.name) + (wished ? ' from' : ' to') + ' wishlist">' + ICON.heart + '</button>' +
+      '<div class="card-actions">' +
+        '<button type="button" data-quick="' + p.id + '">Quick view</button>' +
+        '<button type="button" class="add" data-quickadd="' + p.id + '"' + (inStock(p) ? '' : ' disabled') + '>' + (inStock(p) ? 'Add to cart' : 'Sold out') + '</button>' +
+      '</div>' + sizePop +
+    '</div>' +
+    '<div class="card-body">' +
+      '<a class="card-title" href="#/product/' + p.id + '" data-select>' + esc(p.name) + '</a>' +
+      '<p class="card-meta">' + esc(subLabel(p)) + '</p>' +
+      priceHTML(p) +
+      '<div class="rating-row">' + stars(p.rating) + '<span>' + p.rating + ' (' + p.reviews + ')</span></div>' +
+    '</div></article>';
+}
+function gridHTML(list, listId, listName, cls) {
+  return '<div class="grid ' + (cls || '') + '" data-list-id="' + listId + '" data-list-name="' + esc(listName) + '" data-track-list>' + list.map(card).join('') + '</div>';
+}
+function crumbsHTML(items) {
+  return '<nav class="crumbs wrap" aria-label="Breadcrumb"><ol>' + items.map((it, i) =>
+    i === items.length - 1 ? '<li><span aria-current="page">' + esc(it[0]) + '</span></li>' : '<li><a href="' + it[1] + '">' + esc(it[0]) + '</a></li>'
+  ).join('') + '</ol></nav>';
+}
+function placeholderImg(label) {
+  const t = (label || 'Out of Office').split(' ').slice(0, 2).map(w => w[0]).join('');
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000"><rect width="800" height="1000" fill="#E2D7C4"/><circle cx="400" cy="470" r="120" fill="#EEE7DB"/><text x="400" y="505" text-anchor="middle" font-family="Arial" font-weight="700" font-size="96" fill="#4D5B47">' + esc(t) + '</text><text x="400" y="680" text-anchor="middle" font-family="Arial" font-size="30" fill="#5E5B55">Out of Office</text></svg>';
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+/* ----------------------------------------------------------------------
+   6. VIEWS + ROUTER
+   Hash routes:
+     #/                     home
+     #/shop/all             all products
+     #/shop/men[/tshirts]   category / sub-category
+     #/collection/new|bestsellers|trending
+     #/sale                 sale
+     #/search?q=term        search results
+     #/product/ID           product page
+     #/wishlist  #/checkout  #/order/ID  #/help  #/policy/shipping
+   ---------------------------------------------------------------------- */
+const main = $('#main');
+let pendingScroll = null;
+
+function parseRoute() {
+  const h = location.hash.replace(/^#/, '') || '/';
+  const q = h.indexOf('?');
+  const path = q >= 0 ? h.slice(0, q) : h;
+  const params = new URLSearchParams(q >= 0 ? h.slice(q + 1) : '');
+  return { parts: path.split('/').filter(Boolean).map(decodeURIComponent), params };
+}
+
+/** render(): resolves the route, injects the view, fires page_view, then the view's own tracking. */
+function render() {
+  const r = parseRoute();
+  closeAll();
+  hideSuggest();
+  let v;
+  try {
+    switch (r.parts[0]) {
+      case undefined: v = homeView(); break;
+      case 'shop': v = (r.parts[1] === 'all' || CATS[r.parts[1]]) ? listingView({ type: r.parts[1] === 'all' ? 'all' : 'cat', cat: r.parts[1], sub: r.parts[2] }) : notFoundView(); break;
+      case 'collection': v = listingView({ type: 'collection', tag: r.parts[1] }); break;
+      case 'sale': v = listingView({ type: 'sale' }); break;
+      case 'search': v = listingView({ type: 'search', q: (r.params.get('q') || '').trim() }); break;
+      case 'product': v = P_BY_ID[r.parts[1]] ? productView(P_BY_ID[r.parts[1]]) : notFoundView(); break;
+      case 'wishlist': v = wishlistView(); break;
+      case 'checkout': v = checkoutView(); break;
+      case 'order': v = orderView(r.parts[1]); break;
+      case 'help': v = helpView(r.params.get('section')); break;
+      case 'policy': v = policyView(r.parts[1]); break;
+      default: v = notFoundView();
+    }
+  } catch (e) { console.error(e); v = notFoundView(); }
+
+  PAGE = v.meta;
+  document.title = v.meta.title ? v.meta.title + ' | Out of Office' : 'Out of Office | Travel-ready clothing, bags and gear';
+  main.innerHTML = v.html;
+  setActiveNav(v.meta.section);
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
+  // ---- TRACKING: page_view fires on every route change (virtual page view) ----
+  track('page_view', { page_info: { breadcrumb: v.meta.crumbs || [], view_type: 'virtual' } });
+
+  if (v.after) v.after();
+  if (pendingScroll) { const el = document.getElementById(pendingScroll); pendingScroll = null; if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 60); }
+}
+window.addEventListener('hashchange', render);
+
+/* ---------- Home ---------- */
+function homeView() {
+  const best = PRODUCTS.filter(p => p.tags.includes('bestseller')).slice(0, 8);
+  const fresh = PRODUCTS.filter(p => p.tags.includes('new')).slice(0, 4);
+  const trend = PRODUCTS.filter(p => p.tags.includes('trending'));
+  const count = c => PRODUCTS.filter(p => p.cat === c).length;
+  const back = nextMonday();
+
+  const html =
+  '<section class="hero">' +
+    '<img class="hero-img" src="' + IMG('1501555088652-021faa106b9b', 2000) + '" alt="A hiker with a backpack looking out over mountains">' +
+    '<div class="wrap hero-inner">' +
+      '<div><h1 class="display">Pack light.<br>Reply later.</h1>' +
+      '<p class="lede">Clothes, bags and small essentials for people who would rather be somewhere else, and usually are.</p>' +
+      '<div class="btns"><a class="btn btn-light" href="#/shop/all">Shop now</a><button type="button" class="btn btn-ghost-light" data-scroll="collections">Explore collections</button></div></div>' +
+      '<aside class="autoreply" aria-label="Out of office auto-reply">' +
+        '<div class="ar-head"><span class="logo-dot" aria-hidden="true"></span>Automatic reply</div>' +
+        '<dl><dt>From</dt><dd>You</dd><dt>Subject</dt><dd>Out of office</dd></dl>' +
+        '<p>Thanks for your email. I\'m somewhere with patchy signal and very good light. Anything urgent can probably wait.</p>' +
+        '<p class="ar-sign">Back on ' + back + '.</p>' +
+      '</aside>' +
+    '</div>' +
+  '</section>' +
+
+  '<section class="section wrap" id="collections" aria-labelledby="collTitle">' +
+    '<div class="sec-head"><div><h2 class="sec-title" id="collTitle">Shop by where you\'re headed</h2><p>Four collections, one rule: everything has to fit in a carry-on.</p></div><a class="view-all" href="#/shop/all">View all ' + PRODUCTS.length + ' products</a></div>' +
+    '<div class="collections">' +
+      Object.keys(CATS).map(k => '<a class="coll" href="#/shop/' + k + '"><img src="' + CATS[k].img + '" alt="" loading="lazy"><div class="coll-body"><div><h3>' + esc(CATS[k].label) + '</h3><p>' + esc(CATS[k].blurb) + '</p></div><span class="pill">' + count(k) + ' pieces</span></div></a>').join('') +
+    '</div>' +
+  '</section>' +
+
+  '<section class="section tight wrap" aria-labelledby="bestTitle">' +
+    '<div class="sec-head"><div><h2 class="sec-title" id="bestTitle">Bestsellers</h2><p>The pieces our customers reorder before every trip.</p></div><a class="view-all" href="#/collection/bestsellers">See all bestsellers</a></div>' +
+    gridHTML(best, 'home_bestsellers', 'Home: Bestsellers') +
+  '</section>' +
+
+  '<section class="section tight wrap" aria-label="Promotion">' +
+    '<div class="promo" data-promo="long_weekend" data-promo-name="The Long Weekend Edit" data-promo-slot="home_mid_banner">' +
+      '<img src="' + IMG('1469854523086-cc02fe5d8800', 1800) + '" alt="" loading="lazy">' +
+      '<div class="promo-body"><h2 class="display">The long weekend edit</h2>' +
+      '<p>Up to 30% off travel layers, shorts and packing kit. Add <span class="code">WEEKEND15</span> at checkout for another 15% off orders over ₹4,999.</p>' +
+      '<a class="btn btn-light" href="#/sale" data-promo-click>Shop the sale</a></div>' +
+    '</div>' +
+  '</section>' +
+
+  '<section class="section tight wrap" aria-labelledby="newTitle">' +
+    '<div class="sec-head"><div><h2 class="sec-title" id="newTitle">New arrivals</h2><p>Linen for the heat, canvas for the rain, and a duffel we\'ve been testing for a year.</p></div><a class="view-all" href="#/collection/new">See everything new</a></div>' +
+    gridHTML(fresh, 'home_new_arrivals', 'Home: New arrivals') +
+  '</section>' +
+
+  '<section class="section tight wrap" aria-labelledby="trendTitle">' +
+    '<div class="sec-head"><div><h2 class="sec-title" id="trendTitle">Trending this week</h2><p>Most viewed across the store over the last seven days.</p></div>' +
+    '<div class="scroll-btns"><button type="button" data-scroll-by="-1" aria-label="Scroll left">' + ICON.left + '</button><button type="button" data-scroll-by="1" aria-label="Scroll right">' + ICON.right + '</button></div></div>' +
+    '<div class="scroller" id="trendScroller" data-list-id="home_trending" data-list-name="Home: Trending" data-track-list>' + trend.map(card).join('') + '</div>' +
+  '</section>' +
+
+  '<section class="section wrap" id="story" aria-labelledby="storyTitle">' +
+    '<div class="story">' +
+      '<div class="story-img"><img src="' + IMG('1506905925346-21bda4d32df4', 1200) + '" alt="Mountain ridge at sunrise" loading="lazy"></div>' +
+      '<div><h2 id="storyTitle">Made for the days your calendar says "away"</h2>' +
+      '<p class="body">Out of Office started in 2019 in a Bengaluru flat full of half-packed bags. We were tired of choosing between clothes that looked good and clothes that could handle a sleeper train, a surprise monsoon and a client call from a hill-station café. So we started making our own: breathable fabrics, honest construction, and pieces that fold into a carry-on without complaint.</p>' +
+      '<div class="values">' +
+        '<div><strong>Designed to pack</strong><span>Every piece is tested in a 40-litre bag before it goes on sale.</span></div>' +
+        '<div><strong>Made in India</strong><span>Cut and sewn by partner workshops in Tiruppur, Jaipur and Ludhiana.</span></div>' +
+        '<div><strong>Built to be repaired</strong><span>Free lifetime repairs on bags, and a spare button in every shirt.</span></div>' +
+      '</div></div>' +
+    '</div>' +
+  '</section>' +
+
+  '<section class="section tight wrap" aria-labelledby="testiTitle">' +
+    '<div class="sec-head"><div><h2 class="sec-title" id="testiTitle">Notes from the road</h2><p>Rated 4.7 out of 5 from over 3,400 verified reviews.</p></div></div>' +
+    '<div class="testis">' +
+      testi('I wore the chinos from a Mumbai board meeting straight onto an overnight bus to Goa. No regrets, no creases.', 'Arjun Mehta', 'Mumbai', 'OOO-M-TR-001') +
+      testi('The duffel fits exactly what I need for three days and nothing more, which turns out to be the whole point.', 'Priya Nair', 'Kochi', 'OOO-B-DF-001') +
+      testi('Comfortable enough for a fourteen-hour flight and nice enough that nobody at arrivals could tell.', 'Sana Kapoor', 'New Delhi', 'OOO-W-DR-001') +
+    '</div>' +
+  '</section>' +
+
+  recentSection(null, 'section tight wrap') +
+
+  '<section class="section tight wrap" aria-labelledby="nlTitle">' +
+    '<div class="newsletter"><div><h2 id="nlTitle">Get the postcard</h2><p>One email a fortnight with new arrivals, packing lists and early access to sales. Unsubscribe whenever.</p></div>' +
+    newsletterForm('home') + '</div>' +
+  '</section>';
+
+  return {
+    meta: { name: 'ooo:home', type: 'home', section: 'home', sub: '', title: '', crumbs: ['Home'] },
+    html,
+    after() { observeLists(); observePromos(); }
+  };
+}
+function testi(q, name, city, pid) {
+  const p = P_BY_ID[pid];
+  return '<figure class="testi">' + stars(5) + '<blockquote>' + esc(q) + '</blockquote><footer><strong>' + esc(name) + '</strong>' + esc(city) + ', bought the <a href="#/product/' + pid + '">' + esc(p.name) + '</a></footer></figure>';
+}
+function nextMonday() {
+  const d = new Date(); const add = ((8 - d.getDay()) % 7) || 7; d.setDate(d.getDate() + add);
+  return d.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+function newsletterForm(loc) {
+  if (state.subscribed) return '<div class="nl-success"><span class="tick">' + ICON.check + '</span><div><strong>You\'re on the list</strong><p>Your next postcard is on its way. Use WELCOME10 for 10% off your first order.</p></div></div>';
+  return '<form class="nl-form" data-newsletter="' + loc + '" novalidate><label class="sr-only" for="nl-' + loc + '">Email address</label><input id="nl-' + loc + '" type="email" name="email" placeholder="you@example.com" autocomplete="email" required><button class="btn btn-green" type="submit">Subscribe</button><p class="field-error" hidden></p></form>';
+}
+
+/* ---------- Recently viewed / recommendations ---------- */
+function recentSection(excludeId, cls) {
+  const ids = state.recent.filter(id => id !== excludeId).slice(0, 4);
+  if (!ids.length) return '';
+  return '<section class="' + cls + '" aria-labelledby="recentTitle"><div class="sec-head"><div><h2 class="sec-title" id="recentTitle">Recently viewed</h2></div><button type="button" class="link-btn" data-clear-recent>Clear history</button></div>' +
+    gridHTML(ids.map(id => P_BY_ID[id]), 'recently_viewed', 'Recently viewed') + '</section>';
+}
+/** Recommendations: score products by categories the visitor has shown interest in (recent, wishlist, cart). */
+function recommended(excludeIds, n) {
+  const weights = {};
+  const bump = (id, w) => { const p = P_BY_ID[id]; if (!p) return; weights[p.cat] = (weights[p.cat] || 0) + w; weights[p.cat + ':' + p.sub] = (weights[p.cat + ':' + p.sub] || 0) + w / 2; };
+  state.recent.forEach(id => bump(id, 1)); state.wish.forEach(id => bump(id, 2)); state.cart.forEach(l => bump(l.id, 3));
+  const inCart = new Set(state.cart.map(l => l.id));
+  return PRODUCTS.filter(p => !excludeIds.includes(p.id) && !inCart.has(p.id) && inStock(p))
+    .map(p => ({ p, s: (weights[p.cat] || 0) * 0.6 + (weights[p.cat + ':' + p.sub] || 0) * -0.4 + p.rating + (p.tags.includes('bestseller') ? 0.5 : 0) + (hash(p.id) % 10) / 50 }))
+    .sort((a, b) => b.s - a.s).slice(0, n).map(x => x.p);
+}
+
+/* ---------- Listing (category / sale / search / collection) ---------- */
+let LF = null; // current listing filter state
+
+function listingView(ctx) {
+  let base, title, desc, crumbs, meta, listId, listName;
+  if (ctx.type === 'cat') {
+    const c = CATS[ctx.cat];
+    if (ctx.sub && !c.subs[ctx.sub]) return notFoundView();
+    base = PRODUCTS.filter(p => p.cat === ctx.cat);
+    title = ctx.sub ? c.subs[ctx.sub] : c.label;
+    desc = c.blurb;
+    crumbs = [['Home', '#/'], [c.label, '#/shop/' + ctx.cat]];
+    if (ctx.sub) crumbs.push([c.subs[ctx.sub], '']);
+    const subName = ctx.sub ? c.subs[ctx.sub].toLowerCase() : '';
+    meta = { name: 'ooo:' + ctx.cat + (ctx.sub ? ':' + ctx.sub : ''), type: ctx.sub ? 'sub_category' : 'category', section: ctx.cat, sub: ctx.sub || '', title: ctx.sub ? c.label + ' ' + subName : c.label };
+    listId = 'plp_' + ctx.cat + (ctx.sub ? '_' + ctx.sub : '');
+    listName = 'Category: ' + c.label + (ctx.sub ? ' > ' + c.subs[ctx.sub] : '');
+  } else if (ctx.type === 'sale') {
+    base = PRODUCTS.filter(isSale);
+    title = 'Sale'; desc = 'Last season\'s favourites at up to 30% off. Prices already reduced, no code needed.';
+    crumbs = [['Home', '#/'], ['Sale', '']];
+    meta = { name: 'ooo:sale', type: 'category', section: 'sale', sub: '', title: 'Sale' };
+    listId = 'plp_sale'; listName = 'Sale';
+  } else if (ctx.type === 'search') {
+    base = searchProducts(ctx.q);
+    title = ctx.q ? 'Results for "' + ctx.q + '"' : 'Search';
+    desc = ctx.q ? '' : 'Type in the search bar to find products by name, type or colour.';
+    crumbs = [['Home', '#/'], ['Search', '']];
+    meta = { name: 'ooo:search results', type: 'search', section: 'search', sub: '', title: 'Search' };
+    listId = 'search_results'; listName = 'Search results';
+  } else if (ctx.type === 'collection') {
+    const map = { new: ['New arrivals', 'Fresh from the sampling room.'], bestsellers: ['Bestsellers', 'The pieces our customers reorder most.'], trending: ['Trending', 'Most viewed this week.'] };
+    if (!map[ctx.tag]) return notFoundView();
+    base = PRODUCTS.filter(p => p.tags.includes(ctx.tag === 'bestsellers' ? 'bestseller' : ctx.tag));
+    title = map[ctx.tag][0]; desc = map[ctx.tag][1];
+    crumbs = [['Home', '#/'], [title, '']];
+    meta = { name: 'ooo:collection:' + ctx.tag, type: 'collection', section: 'collection', sub: ctx.tag, title };
+    listId = 'collection_' + ctx.tag; listName = 'Collection: ' + title;
+  } else {
+    base = PRODUCTS.slice();
+    title = 'All products'; desc = 'Everything we make, from tees to trek packs.';
+    crumbs = [['Home', '#/'], ['All products', '']];
+    meta = { name: 'ooo:all products', type: 'category', section: 'all', sub: '', title: 'All products' };
+    listId = 'plp_all'; listName = 'All products';
+  }
+  meta.crumbs = crumbs.map(c => c[0]);
+
+  const prices = PRODUCTS.map(p => p.price);
+  const PMIN = Math.floor(Math.min.apply(null, prices) / 100) * 100;
+  const PMAX = Math.ceil(Math.max.apply(null, prices) / 100) * 100;
+  LF = { ctx, base, listId, listName, cats: new Set(), subs: new Set(), min: PMIN, max: PMAX, PMIN, PMAX, inStock: false, onSale: false, sort: 'featured' };
+
+  // Sub-category chips on category pages
+  let chips = '';
+  if (ctx.type === 'cat') {
+    const c = CATS[ctx.cat];
+    chips = '<div class="chips wrap" aria-label="' + esc(c.label) + ' categories"><a class="chip' + (!ctx.sub ? ' is-active' : '') + '" href="#/shop/' + ctx.cat + '">All ' + esc(c.label.toLowerCase()) + ' <span class="n">' + PRODUCTS.filter(p => p.cat === ctx.cat).length + '</span></a>' +
+      Object.keys(c.subs).map(s => '<a class="chip' + (ctx.sub === s ? ' is-active' : '') + '" href="#/shop/' + ctx.cat + '/' + s + '">' + esc(c.subs[s]) + ' <span class="n">' + PRODUCTS.filter(p => p.cat === ctx.cat && p.sub === s).length + '</span></a>').join('') + '</div>';
+  }
+
+  // Filter groups: category filter when not on a category page; sub-category filter on a category page without a sub selected
+  let catGroup = '';
+  if (ctx.type !== 'cat') {
+    catGroup = '<div class="fgroup"><h3>Category</h3>' + Object.keys(CATS).map(k => {
+      const n = base.filter(p => p.cat === k).length;
+      return '<label class="check"><input type="checkbox" data-f-cat="' + k + '"' + (n ? '' : ' disabled') + '>' + esc(CATS[k].label) + '<span class="n">' + n + '</span></label>';
+    }).join('') + '</div>';
+  } else if (!ctx.sub) {
+    const c = CATS[ctx.cat];
+    catGroup = '<div class="fgroup"><h3>Type</h3>' + Object.keys(c.subs).map(s => '<label class="check"><input type="checkbox" data-f-sub="' + s + '">' + esc(c.subs[s]) + '<span class="n">' + base.filter(p => p.sub === s).length + '</span></label>').join('') + '</div>';
+  }
+
+  const html = crumbsHTML(crumbs) +
+    '<div class="wrap page-head"><div><h1 class="display">' + esc(title) + '</h1>' + (desc ? '<p>' + esc(desc) + '</p>' : '') + '</div></div>' +
+    chips +
+    '<div class="wrap listing">' +
+      '<aside class="filters" id="filters" aria-label="Filters">' +
+        '<div class="filters-head"><h2>Filters</h2><button class="icon-btn" type="button" data-close-filters aria-label="Close filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
+        catGroup +
+        '<div class="fgroup"><h3>Price</h3><div class="range-vals"><span id="fMinLbl">' + fmt(PMIN) + '</span><span id="fMaxLbl">' + fmt(PMAX) + '</span></div>' +
+          '<div class="range-dual"><div class="range-track"></div><div class="range-fill" id="fFill"></div>' +
+          '<input type="range" id="fMin" min="' + PMIN + '" max="' + PMAX + '" step="100" value="' + PMIN + '" aria-label="Minimum price">' +
+          '<input type="range" id="fMax" min="' + PMIN + '" max="' + PMAX + '" step="100" value="' + PMAX + '" aria-label="Maximum price"></div></div>' +
+        '<div class="fgroup"><h3>Availability</h3>' +
+          '<label class="check"><input type="checkbox" data-f-stock>In stock only</label>' +
+          (ctx.type !== 'sale' ? '<label class="check"><input type="checkbox" data-f-sale>On sale</label>' : '') +
+        '</div>' +
+        '<div class="fgroup"><button type="button" class="link-btn" data-clear-filters>Clear all filters</button></div>' +
+        '<button type="button" class="btn btn-primary btn-block show-results" data-close-filters>Show <span id="fCountBtn"></span> results</button>' +
+      '</aside>' +
+      '<div>' +
+        '<div class="toolbar"><button type="button" class="btn btn-outline filter-toggle" data-open-filters>Filters</button><span class="count" id="resCount" aria-live="polite"></span>' +
+        '<label class="sr-only" for="sortSel">Sort products</label><select id="sortSel">' +
+          '<option value="featured">Sort: Featured</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option><option value="rating">Top rated</option><option value="newest">Newest first</option>' +
+        '</select></div>' +
+        '<div class="active-pills" id="activePills"></div>' +
+        '<div id="resultsGrid"></div>' +
+      '</div>' +
+    '</div>';
+
+  return {
+    meta, html,
+    after() {
+      bindListing();
+      const res = renderResults(false);
+      // ---- TRACKING: search fires on search results page with term + results count ----
+      if (ctx.type === 'search' && ctx.q) track('search', { search: { search_term: ctx.q, search_term_normalised: ctx.q.toLowerCase(), results_count: res.length, search_type: 'site_search' } });
+      // ---- TRACKING: view_item_list fires immediately for listing pages ----
+      const g = $('#resultsGrid .grid'); if (g) trackList(g);
+      $$('[data-track-list]', main).forEach(el => { if (el.closest('#resultsGrid')) el.dataset.tracked = '1'; });
+    }
+  };
+}
+
+function searchProducts(q) {
+  if (!q) return [];
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  return PRODUCTS.filter(p => {
+    const hay = (p.name + ' ' + subLabel(p) + ' ' + CATS[p.cat].label + ' ' + p.colours.join(' ') + ' ' + p.id).toLowerCase();
+    return terms.every(t => hay.includes(t) || (t.endsWith('s') && hay.includes(t.slice(0, -1))));
+  });
+}
+
+function filteredProducts() {
+  const f = LF;
+  let list = f.base.filter(p =>
+    (!f.cats.size || f.cats.has(p.cat)) &&
+    (!f.subs.size || f.subs.has(p.sub)) &&
+    p.price >= f.min && p.price <= f.max &&
+    (!f.inStock || inStock(p)) &&
+    (!f.onSale || isSale(p)));
+  if (f.ctx.type === 'cat' && f.ctx.sub) list = list.filter(p => p.sub === f.ctx.sub);
+  const sorters = {
+    featured: (a, b) => (inStock(b) - inStock(a)) || (b.tags.length - a.tags.length) || (b.rating - a.rating),
+    'price-asc': (a, b) => a.price - b.price,
+    'price-desc': (a, b) => b.price - a.price,
+    rating: (a, b) => b.rating - a.rating || b.reviews - a.reviews,
+    newest: (a, b) => (b.tags.includes('new') - a.tags.includes('new')) || (PRODUCTS.indexOf(b) - PRODUCTS.indexOf(a))
+  };
+  return list.slice().sort(sorters[f.sort]);
+}
+
+function renderResults(trackFilter) {
+  const list = filteredProducts();
+  const n = list.length;
+  $('#resCount').textContent = n + (n === 1 ? ' product' : ' products');
+  const btn = $('#fCountBtn'); if (btn) btn.textContent = n;
+  const grid = $('#resultsGrid');
+  if (!n) {
+    const isSearch = LF.ctx.type === 'search';
+    grid.innerHTML = '<div class="empty"><h2>' + (isSearch && LF.ctx.q && !LF.base.length ? 'No matches for "' + esc(LF.ctx.q) + '"' : 'No products match these filters') + '</h2>' +
+      '<p>' + (isSearch && !LF.base.length ? 'Try a broader word like "shirt", "bag" or a colour like "olive".' : 'Widen the price range or clear a filter to see more.') + '</p>' +
+      (LF.base.length ? '<button class="btn btn-primary" type="button" data-clear-filters>Clear all filters</button>' : '<a class="btn btn-primary" href="#/collection/bestsellers">Browse bestsellers</a>') + '</div>';
+    if (isSearch && !LF.base.length) grid.innerHTML += '<div class="section tight" style="padding-top:48px"><div class="sec-head"><h2 class="sec-title">Popular right now</h2></div>' + gridHTML(PRODUCTS.filter(p => p.tags.includes('bestseller')).slice(0, 4), 'search_no_results_recs', 'Search: no results recommendations') + '</div>';
+    observeLists();
+  } else {
+    grid.innerHTML = gridHTML(list, LF.listId, LF.listName, 'cols-3');
+  }
+  renderPills();
+  if (trackFilter) {
+    // ---- TRACKING: filter / sort changes (helpful for listing analysis) ----
+    track('filter_apply', { filters: currentFilters(), search: LF.ctx.q ? { search_term: LF.ctx.q } : undefined, list: { item_list_id: LF.listId, item_list_name: LF.listName, results_count: n } });
+  }
+  return list;
+}
+function currentFilters() {
+  return { categories: Array.from(LF.cats), sub_categories: Array.from(LF.subs), price_min: LF.min, price_max: LF.max, in_stock_only: LF.inStock, on_sale_only: LF.onSale, sort: LF.sort };
+}
+function renderPills() {
+  const pills = [];
+  LF.cats.forEach(c => pills.push(['cat', c, CATS[c].label]));
+  if (LF.ctx.type === 'cat') LF.subs.forEach(s => pills.push(['sub', s, CATS[LF.ctx.cat].subs[s]]));
+  if (LF.min > LF.PMIN || LF.max < LF.PMAX) pills.push(['price', '', fmt(LF.min) + ' to ' + fmt(LF.max)]);
+  if (LF.inStock) pills.push(['stock', '', 'In stock']);
+  if (LF.onSale) pills.push(['sale', '', 'On sale']);
+  $('#activePills').innerHTML = pills.map(p => '<button type="button" data-pill="' + p[0] + '" data-val="' + p[1] + '" aria-label="Remove filter ' + esc(p[2]) + '">' + esc(p[2]) + ' ×</button>').join('');
+}
+function syncRange() {
+  const span = LF.PMAX - LF.PMIN;
+  $('#fMinLbl').textContent = fmt(LF.min); $('#fMaxLbl').textContent = fmt(LF.max);
+  const fill = $('#fFill'); fill.style.left = ((LF.min - LF.PMIN) / span * 100) + '%'; fill.style.right = ((LF.PMAX - LF.max) / span * 100) + '%';
+  $('#fMin').value = LF.min; $('#fMax').value = LF.max;
+}
+function bindListing() {
+  syncRange();
+  let t;
+  const debounced = () => { clearTimeout(t); t = setTimeout(() => renderResults(true), 250); };
+  $('#fMin').addEventListener('input', e => { LF.min = Math.min(+e.target.value, LF.max - 100); syncRange(); debounced(); });
+  $('#fMax').addEventListener('input', e => { LF.max = Math.max(+e.target.value, LF.min + 100); syncRange(); debounced(); });
+  $('#filters').addEventListener('change', e => {
+    const el = e.target;
+    if (el.dataset.fCat) el.checked ? LF.cats.add(el.dataset.fCat) : LF.cats.delete(el.dataset.fCat);
+    else if (el.dataset.fSub) el.checked ? LF.subs.add(el.dataset.fSub) : LF.subs.delete(el.dataset.fSub);
+    else if (el.hasAttribute('data-f-stock')) LF.inStock = el.checked;
+    else if (el.hasAttribute('data-f-sale')) LF.onSale = el.checked;
+    else return;
+    renderResults(true);
+  });
+  $('#sortSel').addEventListener('change', e => {
+    LF.sort = e.target.value; renderResults(false);
+    track('sort_change', { list: { item_list_id: LF.listId, item_list_name: LF.listName }, filters: currentFilters() });
+  });
+}
+function clearFilters() {
+  LF.cats.clear(); LF.subs.clear(); LF.min = LF.PMIN; LF.max = LF.PMAX; LF.inStock = false; LF.onSale = false;
+  $$('#filters input[type=checkbox]').forEach(i => { i.checked = false; });
+  syncRange(); renderResults(true);
+}
+
+/* ---------- Product page ---------- */
+function productView(p) {
+  addRecent(p.id);
+  const c = CATS[p.cat];
+  const related = PRODUCTS.filter(x => x.id !== p.id && x.cat === p.cat).sort((a, b) => (b.sub === p.sub) - (a.sub === p.sub) || b.rating - a.rating).slice(0, 4);
+  const recs = recommended([p.id].concat(related.map(r => r.id)), 4).filter(x => x.cat !== p.cat || true);
+  const crumbs = [['Home', '#/'], [c.label, '#/shop/' + p.cat], [subLabel(p), '#/shop/' + p.cat + '/' + p.sub], [p.name, '']];
+
+  const html = crumbsHTML(crumbs) +
+    '<div class="wrap pdp">' +
+      '<div class="pdp-media"><div class="zoom" id="zoom"><img src="' + p.img.replace('w=800', 'w=1400') + '" alt="' + esc(p.name) + '"><span class="zoom-hint">Hover to zoom</span></div></div>' +
+      '<div class="pdp-info">' +
+        '<a class="sub-link" href="#/shop/' + p.cat + '/' + p.sub + '">' + esc(c.label) + ', ' + esc(subLabel(p)) + '</a>' +
+        '<h1>' + esc(p.name) + '</h1>' +
+        '<div class="pdp-meta">' + stars(p.rating) + '<a href="#reviews" data-scroll="reviews">' + p.rating + ' from ' + p.reviews + ' reviews</a><span>SKU ' + p.id + '</span></div>' +
+        '<div class="pdp-price">' + priceHTML(p) + '</div><p class="tax-note">Price includes GST</p>' +
+        '<p class="pdp-desc">' + esc(p.desc) + '</p>' +
+        stockHTML(p) +
+        buyBox(p, 'product_page') +
+        '<div class="perks"><div>' + ICON.truck + '<span>Free delivery over ' + fmt(FREE_SHIP) + '. Arrives by ' + deliveryDate(4) + ' in most cities.</span></div><div>' + ICON.ret + '<span>30-day free returns and exchanges with doorstep pickup.</span></div><div>' + ICON.shield + '<span>Secure checkout with UPI, cards and cash on delivery.</span></div></div>' +
+        '<div style="margin-top:20px">' +
+          '<details class="acc" open><summary>Details</summary><div class="acc-body"><ul>' + p.details.map(d => '<li>' + esc(d) + '</li>').join('') + '</ul></div></details>' +
+          '<details class="acc"><summary>Delivery and returns</summary><div class="acc-body">Standard delivery in 3 to 5 working days, express in 1 to 2 days for metro cities. Returns are free within 30 days for unworn items with tags. See our <a href="#/policy/returns">returns policy</a>.</div></details>' +
+          '<details class="acc"><summary>Care</summary><div class="acc-body">Wash cold, inside out, with similar colours. Line dry in shade. Skip the dryer and it will last years longer.</div></details>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    reviewsSection(p) +
+    '<section class="section tight wrap" aria-labelledby="relTitle"><div class="sec-head"><div><h2 class="sec-title" id="relTitle">More from ' + esc(c.label.toLowerCase()) + '</h2></div><a class="view-all" href="#/shop/' + p.cat + '">Shop all ' + esc(c.label.toLowerCase()) + '</a></div>' + gridHTML(related, 'pdp_related', 'PDP: Related products') + '</section>' +
+    '<section class="section tight wrap" aria-labelledby="recTitle"><div class="sec-head"><div><h2 class="sec-title" id="recTitle">Recommended for you</h2><p>Based on what you\'ve browsed and saved.</p></div></div>' + gridHTML(recs, 'pdp_recommended', 'PDP: Recommended for you') + '</section>' +
+    recentSection(p.id, 'section tight wrap');
+
+  return {
+    meta: { name: 'ooo:product:' + p.name.toLowerCase(), type: 'product', section: p.cat, sub: p.sub, title: p.name, crumbs: crumbs.map(x => x[0]), product_id: p.id },
+    html,
+    after() {
+      // ---- TRACKING: view_item on product page ----
+      track('view_item', { ecommerce: { currency: 'INR', value: p.price, items: [dlItem(p, { colour: p.colours[0] })] }, interaction: { view_type: 'product_page' } });
+      bindZoom(); observeLists();
+    }
+  };
+}
+function deliveryDate(days) { const d = new Date(); d.setDate(d.getDate() + days); return d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }); }
+function addRecent(id) { state.recent = [id].concat(state.recent.filter(x => x !== id)).slice(0, 8); store.set('ooo_recent', state.recent); }
+function bindZoom() {
+  const z = $('#zoom'); if (!z || !matchMedia('(hover:hover)').matches) { const h = z && $('.zoom-hint', z); if (h) h.remove(); return; }
+  const img = $('img', z);
+  z.addEventListener('mousemove', e => { const r = z.getBoundingClientRect(); img.style.transformOrigin = ((e.clientX - r.left) / r.width * 100) + '% ' + ((e.clientY - r.top) / r.height * 100) + '%'; });
+  z.addEventListener('mouseenter', () => z.classList.add('is-zoomed'));
+  z.addEventListener('mouseleave', () => z.classList.remove('is-zoomed'));
+}
+
+/** Colour, size, quantity and add-to-cart controls shared by product page and quick view. */
+function buyBox(p, source) {
+  const wished = state.wish.includes(p.id);
+  const colours = '<fieldset><legend>Colour: <span data-colour-label>' + esc(p.colours[0]) + '</span></legend><div class="swatches">' +
+    p.colours.map((c, i) => '<button type="button" class="swatch" style="--c:' + (COLOURS[c] || '#ccc') + '" data-pick-colour="' + esc(c) + '" aria-pressed="' + (i === 0) + '" aria-label="' + esc(c) + '"></button>').join('') + '</div></fieldset>';
+  const sizes = p.sizes.length ? '<fieldset><div class="legend-row"><legend>Size' + (p.sub === 'trousers' && p.cat === 'men' ? ' (waist, inches)' : '') + '</legend><button type="button" class="link-btn" data-size-guide="' + p.id + '">Size guide</button></div><div class="sizes">' +
+    p.sizes.map(s => { const out = (p.soldOut || []).includes(s); return '<button type="button" class="size" data-pick-size="' + s + '" aria-pressed="false"' + (out ? ' disabled aria-label="' + s + ', sold out"' : '') + '>' + s + '</button>'; }).join('') +
+    '</div><p class="field-error" data-size-error hidden>Choose a size to add this to your cart.</p></fieldset>' : '<p class="small muted" style="margin:0">One size</p>';
+  return '<div class="buybox" data-buybox="' + p.id + '" data-source="' + source + '" data-colour="' + esc(p.colours[0]) + '" data-size="" data-qty="1">' +
+    colours + sizes +
+    '<div class="buy-row">' +
+      '<div class="qty" aria-label="Quantity"><button type="button" data-bb-qty="-1" aria-label="Decrease quantity">−</button><span data-qty-val>1</span><button type="button" data-bb-qty="1" aria-label="Increase quantity">+</button></div>' +
+      '<button type="button" class="btn btn-primary" data-bb-add' + (inStock(p) ? '' : ' disabled') + '>' + (inStock(p) ? 'Add to cart' : 'Sold out') + '</button>' +
+      '<button type="button" class="wish-lg" data-wish="' + p.id + '" aria-pressed="' + wished + '" aria-label="' + (wished ? 'Remove from wishlist' : 'Add to wishlist') + '">' + ICON.heart + '</button>' +
+    '</div>' +
+    (inStock(p) ? '' : '<p class="small muted" style="margin:0">Save it to your wishlist and we\'ll show it as available the moment it\'s back.</p>') +
+  '</div>';
+}
+
+/* ---------- Reviews ---------- */
+function getReviews(p) {
+  const h = hash(p.id);
+  const seeded = [0, 1, 2].map(i => REVIEW_POOL[(h + i * 3) % REVIEW_POOL.length]);
+  return (state.userReviews[p.id] || []).concat(seeded.map((r, i) => Object.assign({}, r, { d: daysAgo(4 + ((h >> i) % 60)), v: true })));
+}
+function daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); }
+function reviewsSection(p) {
+  const list = getReviews(p);
+  const f5 = Math.min(.9, Math.max(.1, .25 + (p.rating - 4) * .6)), f4 = .25, rem = Math.max(0, 1 - f5 - f4);
+  const dist = [f5, f4, rem * .6, rem * .25, rem * .15];
+  return '<section class="section tight wrap" id="reviews" aria-labelledby="revTitle"><div class="sec-head"><h2 class="sec-title" id="revTitle">Customer reviews</h2></div>' +
+    '<div class="reviews"><div class="rev-summary"><div class="rev-avg">' + p.rating + '</div>' + stars(p.rating, 'lg') + '<p class="small muted" style="margin:6px 0 0">Based on ' + p.reviews + ' verified reviews</p>' +
+    '<div class="bars">' + dist.map((f, i) => '<div class="bar"><span>' + (5 - i) + '★</span><i><b style="width:' + Math.round(f * 100) + '%"></b></i><span>' + Math.round(f * p.reviews) + '</span></div>').join('') + '</div>' +
+    '<button type="button" class="btn btn-outline btn-block" data-write-review>Write a review</button>' +
+    '<form class="rev-form" id="revForm" data-pid="' + p.id + '" hidden novalidate>' +
+      '<div class="star-input" role="radiogroup" aria-label="Your rating">' + [5, 4, 3, 2, 1].map(n => '<input type="radio" name="rating" id="rs' + n + '" value="' + n + '"><label for="rs' + n + '" aria-label="' + n + ' stars">★</label>').join('') + '</div>' +
+      '<div class="field"><label for="revName">Name</label><input id="revName" name="name" maxlength="40"></div>' +
+      '<div class="field"><label for="revTitleIn">Headline</label><input id="revTitleIn" name="title" maxlength="60"></div>' +
+      '<div class="field"><label for="revText">Review</label><textarea id="revText" name="text" maxlength="500"></textarea></div>' +
+      '<p class="field-error" hidden></p><button class="btn btn-primary" type="submit">Post review</button></form>' +
+    '</div>' +
+    '<div class="rev-list">' + list.map(r => '<article class="rev">' + stars(r.r) + '<h4>' + esc(r.t) + '</h4><p>' + esc(r.x) + '</p><div class="who">' + esc(r.n) + ', ' + esc(r.c) + ' on ' + esc(r.d) + (r.v ? ' <span class="verified">Verified buyer</span>' : '') + '</div></article>').join('') + '</div></div></section>';
+}
+
+/* ---------- Wishlist ---------- */
+function wishlistView() {
+  const items = state.wish.map(id => P_BY_ID[id]);
+  const html = crumbsHTML([['Home', '#/'], ['Wishlist', '']]) +
+    '<div class="wrap page-head"><div><h1 class="display">Wishlist</h1><p>' + (items.length ? items.length + ' saved ' + (items.length === 1 ? 'item' : 'items') + '. Saved on this device.' : 'Tap the heart on anything you like and it will wait for you here.') + '</p></div>' +
+    (items.length ? '<button class="btn btn-primary" type="button" data-wish-all>Add all in-stock items to cart</button>' : '') + '</div>' +
+    '<div class="wrap" style="padding-bottom:64px">' + (items.length ? gridHTML(items, 'wishlist', 'Wishlist') :
+      '<div class="empty"><h2>Your wishlist is empty</h2><p>Browse bestsellers or new arrivals and save what catches your eye.</p><a class="btn btn-primary" href="#/collection/bestsellers">Browse bestsellers</a></div>') + '</div>' +
+    '<section class="section tight wrap"><div class="sec-head"><h2 class="sec-title">You might also like</h2></div>' + gridHTML(recommended(state.wish, 4), 'wishlist_recs', 'Wishlist: Recommended') + '</section>';
+  return { meta: { name: 'ooo:wishlist', type: 'wishlist', section: 'wishlist', sub: '', title: 'Wishlist', crumbs: ['Home', 'Wishlist'] }, html, after() { observeLists(); } };
+}
+
+/* ---------- Checkout ---------- */
+const STATES = ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh', 'Delhi', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand', 'Karnataka', 'Kerala', 'Ladakh', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'];
+let CK = null;
+
+function checkoutTotals() {
+  const t = cartTotals();
+  const c = state.coupon && COUPONS[state.coupon];
+  const discount = c && t.subtotal >= c.min ? Math.round(t.subtotal * c.pct / 100) : 0;
+  const net = t.subtotal - discount;
+  const shipping = CK && CK.delivery === 'express' ? 299 : (net >= FREE_SHIP || net === 0 ? 0 : 149);
+  const total = net + shipping;
+  return { subtotal: t.subtotal, discount, net, shipping, total, tax: Math.round(net - net / 1.12), count: t.count, savings: t.savings };
+}
+function checkoutView() {
+  const crumbs = [['Home', '#/'], ['Cart', '#/checkout'], ['Checkout', '']];
+  const meta = { name: 'ooo:checkout:details', type: 'checkout', section: 'checkout', sub: 'details', title: 'Checkout', crumbs: ['Home', 'Cart', 'Checkout'] };
+  if (!state.cart.length) {
+    return { meta: Object.assign(meta, { name: 'ooo:checkout:empty cart', sub: 'empty' }), html: crumbsHTML(crumbs) + '<div class="wrap" style="padding:32px var(--gut) 80px"><div class="empty"><h2>Your cart is empty</h2><p>Add something you like and come back to check out.</p><a class="btn btn-primary" href="#/shop/all">Shop all products</a></div></div>' };
+  }
+  CK = CK && CK.inProgress ? CK : { step: 1, details: {}, delivery: 'standard', payment: 'upi', inProgress: true };
+  CK.step = 1;
+  const html = crumbsHTML(crumbs) +
+    '<div class="wrap"><h1 class="display" style="font-size:clamp(34px,4.4vw,58px);margin:18px 0 0">Checkout</h1></div>' +
+    '<div class="wrap checkout"><div><ol class="steps" id="ckSteps"><li>Details</li><li>Delivery</li><li>Payment</li></ol><div id="ckMain"></div></div><aside class="summary" id="ckSummary" aria-label="Order summary"></aside></div>';
+  return {
+    meta, html,
+    after() {
+      renderCkStep(); renderCkSummary();
+      // ---- TRACKING: begin_checkout ----
+      track('begin_checkout', { ecommerce: { currency: 'INR', value: checkoutTotals().net, coupon: state.coupon || null, items: state.cart.map(l => lineItem(l)) }, checkout: { step: 1, step_name: 'details' } });
+    }
+  };
+}
+function renderCkStep() {
+  $$('#ckSteps li').forEach((li, i) => { li.className = i + 1 < CK.step ? 'is-done' : i + 1 === CK.step ? 'is-current' : ''; if (i + 1 === CK.step) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current'); });
+  const d = CK.details, m = $('#ckMain');
+  PAGE.sub = ['details', 'delivery', 'payment'][CK.step - 1]; PAGE.name = 'ooo:checkout:' + PAGE.sub;
+  if (CK.step === 1) {
+    const f = (id, label, type, extra, full) => '<div class="field' + (full ? ' full' : '') + '"><label for="ck_' + id + '">' + label + '</label><input id="ck_' + id + '" name="' + id + '" type="' + type + '" value="' + esc(d[id] || '') + '" ' + (extra || '') + '><p class="field-error" hidden></p></div>';
+    m.innerHTML = '<form class="panel" id="ckForm" novalidate><h2>Contact and address</h2><p class="muted">We\'ll only use these to deliver your order and send updates.</p><div class="form-grid">' +
+      f('name', 'Full name', 'text', 'autocomplete="name"', true) + f('email', 'Email', 'email', 'autocomplete="email"') + f('phone', 'Mobile number', 'tel', 'autocomplete="tel" inputmode="numeric" placeholder="10-digit number"') +
+      f('address', 'Address', 'text', 'autocomplete="street-address" placeholder="House number, street, area"', true) + f('city', 'City', 'text', 'autocomplete="address-level2"') +
+      '<div class="field"><label for="ck_state">State</label><select id="ck_state" name="state"><option value="">Select state</option>' + STATES.map(s => '<option' + (d.state === s ? ' selected' : '') + '>' + s + '</option>').join('') + '</select><p class="field-error" hidden></p></div>' +
+      f('pin', 'PIN code', 'text', 'inputmode="numeric" maxlength="6" autocomplete="postal-code"') +
+      '</div><div class="ck-actions"><a href="#/shop/all" class="link-btn">Continue shopping</a><button class="btn btn-primary" type="submit">Continue to delivery</button></div></form>';
+  } else if (CK.step === 2) {
+    const t = checkoutTotals();
+    m.innerHTML = '<form class="panel" id="ckForm"><h2>Delivery</h2><p class="muted">Delivering to ' + esc(d.city) + ', ' + esc(d.state) + ' ' + esc(d.pin) + '.</p>' + reviewBlock(1) +
+      '<div class="opts">' +
+      '<label class="opt"><input type="radio" name="delivery" value="standard"' + (CK.delivery === 'standard' ? ' checked' : '') + '><span><strong>Standard</strong><span class="small muted">3 to 5 working days, arrives by ' + deliveryDate(5) + '</span></span><span class="opt-price">' + (t.net >= FREE_SHIP ? 'Free' : fmt(149)) + '</span></label>' +
+      '<label class="opt"><input type="radio" name="delivery" value="express"' + (CK.delivery === 'express' ? ' checked' : '') + '><span><strong>Express</strong><span class="small muted">1 to 2 working days in metro cities, arrives by ' + deliveryDate(2) + '</span></span><span class="opt-price">' + fmt(299) + '</span></label>' +
+      '</div><div class="ck-actions"><button type="button" class="link-btn" data-ck-back>Back to details</button><button class="btn btn-primary" type="submit">Continue to payment</button></div></form>';
+    $('#ckForm').addEventListener('change', e => { if (e.target.name === 'delivery') { CK.delivery = e.target.value; renderCkSummary(); } });
+  } else {
+    const t = checkoutTotals();
+    m.innerHTML = '<form class="panel" id="ckForm" novalidate><h2>Payment</h2><p class="muted">Choose how you\'d like to pay.</p>' + reviewBlock(1) + reviewBlock(2) +
+      '<div class="opts" id="payOpts">' +
+      payOpt('upi', 'UPI', 'Pay with any UPI app') + payOpt('card', 'Credit or debit card', 'Visa, Mastercard, RuPay') + payOpt('cod', 'Cash on delivery', 'Pay when your order arrives') +
+      '</div><div id="payFields"></div>' +
+      '<div class="demo-note">This is a demo store. No payment is taken and no real details are needed; use any value in the correct format.</div>' +
+      '<div class="ck-actions"><button type="button" class="link-btn" data-ck-back>Back to delivery</button><button class="btn btn-green" type="submit">Place order, ' + fmt(t.total) + '</button></div></form>';
+    renderPayFields();
+    $('#payOpts').addEventListener('change', e => { CK.payment = e.target.value; renderPayFields(); });
+  }
+  $('#ckForm').addEventListener('submit', onCkSubmit);
+}
+function payOpt(v, t, s) { return '<label class="opt"><input type="radio" name="payment" value="' + v + '"' + (CK.payment === v ? ' checked' : '') + '><span><strong>' + t + '</strong><span class="small muted">' + s + '</span></span></label>'; }
+function renderPayFields() {
+  const el = $('#payFields');
+  if (CK.payment === 'upi') el.innerHTML = '<div class="field" style="margin-top:18px"><label for="ck_upi">UPI ID</label><input id="ck_upi" placeholder="name@bank"><p class="field-error" hidden></p></div>';
+  else if (CK.payment === 'card') el.innerHTML = '<div class="form-grid" style="margin-top:18px"><div class="field full"><label for="ck_card">Card number</label><input id="ck_card" inputmode="numeric" placeholder="4111 1111 1111 1111" maxlength="19"><p class="field-error" hidden></p></div><div class="field"><label for="ck_exp">Expiry (MM/YY)</label><input id="ck_exp" placeholder="08/29" maxlength="5"><p class="field-error" hidden></p></div><div class="field"><label for="ck_cvv">CVV</label><input id="ck_cvv" inputmode="numeric" maxlength="4" placeholder="123"><p class="field-error" hidden></p></div></div>';
+  else el.innerHTML = '<p class="small muted" style="margin:16px 0 0">Keep the exact amount ready if you can. UPI on delivery is also accepted.</p>';
+}
+function reviewBlock(step) {
+  const d = CK.details;
+  if (step === 1) return '<div class="review-block"><div><strong>' + esc(d.name) + '</strong><p>' + esc(d.address) + ', ' + esc(d.city) + ', ' + esc(d.state) + ' ' + esc(d.pin) + '<br>' + esc(d.email) + ', ' + esc(d.phone) + '</p></div><button type="button" class="link-btn" data-ck-goto="1">Edit</button></div>';
+  return '<div class="review-block"><div><strong>' + (CK.delivery === 'express' ? 'Express delivery' : 'Standard delivery') + '</strong><p>Arrives by ' + deliveryDate(CK.delivery === 'express' ? 2 : 5) + '</p></div><button type="button" class="link-btn" data-ck-goto="2">Edit</button></div>';
+}
+function setErr(input, msg) {
+  const box = input.closest('.field'); const p = box && $('.field-error', box);
+  input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+  if (p) { p.textContent = msg || ''; p.hidden = !msg; }
+  return !msg;
+}
+function onCkSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  if (CK.step === 1) {
+    const v = n => (form.elements[n].value || '').trim();
+    const rules = {
+      name: x => x.length >= 2 ? '' : 'Enter your full name.',
+      email: x => EMAIL_RE.test(x) ? '' : 'Enter an email address like name@example.com.',
+      phone: x => /^[6-9]\d{9}$/.test(x.replace(/\D/g, '').slice(-10)) && x.replace(/\D/g, '').length >= 10 ? '' : 'Enter a 10-digit Indian mobile number.',
+      address: x => x.length >= 6 ? '' : 'Enter your house number, street and area.',
+      city: x => x.length >= 2 ? '' : 'Enter your city.',
+      state: x => x ? '' : 'Select your state.',
+      pin: x => /^[1-9]\d{5}$/.test(x) ? '' : 'Enter a 6-digit PIN code.'
+    };
+    let ok = true, first = null;
+    Object.keys(rules).forEach(k => { const msg = rules[k](v(k)); if (!setErr(form.elements[k], msg)) { ok = false; first = first || form.elements[k]; } CK.details[k] = v(k); });
+    if (!ok) { first.focus(); return; }
+    CK.step = 2; renderCkStep(); $('#ckMain').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else if (CK.step === 2) {
+    // ---- TRACKING: add_shipping_info ----
+    track('add_shipping_info', { ecommerce: { currency: 'INR', value: checkoutTotals().net, shipping_tier: CK.delivery, coupon: state.coupon || null, items: state.cart.map(l => lineItem(l)) }, checkout: { step: 2, step_name: 'delivery', shipping_state: CK.details.state } });
+    CK.step = 3; renderCkStep(); $('#ckMain').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    let ok = true;
+    if (CK.payment === 'upi') ok = setErr($('#ck_upi'), /^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test($('#ck_upi').value.trim()) ? '' : 'Enter a UPI ID like name@okbank.');
+    if (CK.payment === 'card') {
+      const a = setErr($('#ck_card'), $('#ck_card').value.replace(/\s/g, '').length === 16 ? '' : 'Enter a 16-digit card number.');
+      const b = setErr($('#ck_exp'), /^(0[1-9]|1[0-2])\/\d{2}$/.test($('#ck_exp').value.trim()) ? '' : 'Use MM/YY, for example 08/29.');
+      const c = setErr($('#ck_cvv'), /^\d{3,4}$/.test($('#ck_cvv').value.trim()) ? '' : 'Enter the 3 or 4 digits on the back.');
+      ok = a && b && c;
+    }
+    if (!ok) return;
+    placeOrder();
+  }
+}
+function renderCkSummary() {
+  const t = checkoutTotals();
+  const c = state.coupon && COUPONS[state.coupon];
+  const el = $('#ckSummary'); if (!el) return;
+  el.innerHTML = '<h2>Order summary</h2><div class="sum-items">' + state.cart.map(l => { const p = P_BY_ID[l.id]; return '<div class="sum-item"><img src="' + p.img + '" alt=""><div><strong>' + esc(p.name) + '</strong><span class="q">' + esc([l.colour, l.size].filter(Boolean).join(', ')) + ', qty ' + l.qty + '</span></div><span>' + fmt(p.price * l.qty) + '</span></div>'; }).join('') + '</div>' +
+    '<form class="coupon" id="couponForm" novalidate><label class="sr-only" for="couponIn">Discount code</label><input id="couponIn" placeholder="Discount code" value="' + esc(state.coupon || '') + '"><button class="btn btn-outline" type="submit">' + (state.coupon ? 'Remove' : 'Apply') + '</button></form>' +
+    '<p class="coupon-msg" id="couponMsg">' + (c ? (t.discount ? '<span class="ok">' + esc(state.coupon) + ' applied: ' + esc(c.label) + '</span>' : '<span class="err">' + esc(state.coupon) + ' needs a subtotal of ' + fmt(c.min) + ' or more.</span>') : '<span class="muted">Try WELCOME10 or WEEKEND15.</span>') + '</p>' +
+    '<div class="sum-lines"><div><span>Subtotal (' + t.count + ' items)</span><span>' + fmt(t.subtotal) + '</span></div>' +
+    (t.discount ? '<div class="save"><span>Discount</span><span>−' + fmt(t.discount) + '</span></div>' : '') +
+    '<div><span>Delivery</span><span>' + (t.shipping ? fmt(t.shipping) : 'Free') + '</span></div>' +
+    '<div class="total"><span>Total</span><span>' + fmt(t.total) + '</span></div>' +
+    '<div class="tiny muted"><span>Includes GST of about ' + fmt(t.tax) + '</span></div>' +
+    (t.savings + t.discount > 0 ? '<div class="save"><span>You save</span><span>' + fmt(t.savings + t.discount) + '</span></div>' : '') + '</div>';
+  $('#couponForm').addEventListener('submit', e => {
+    e.preventDefault();
+    if (state.coupon) { state.coupon = null; store.set('ooo_coupon', null); renderCkSummary(); refreshPlaceBtn(); return; }
+    applyCoupon($('#couponIn').value, 'checkout');
+  });
+}
+function refreshPlaceBtn() { const b = $('#ckForm .btn-green'); if (b) b.textContent = 'Place order, ' + fmt(checkoutTotals().total); }
+function applyCoupon(raw, where) {
+  const code = (raw || '').trim().toUpperCase();
+  const c = COUPONS[code];
+  // ---- TRACKING: coupon attempt (success or failure) ----
+  track('coupon_apply', { coupon: { code: code, success: !!c, location: where } });
+  if (!c) { const m = $('#couponMsg'); if (m) m.innerHTML = '<span class="err">' + (code ? '"' + esc(code) + '" isn\'t a valid code. Check the spelling and try again.' : 'Enter a discount code.') + '</span>'; return false; }
+  state.coupon = code; store.set('ooo_coupon', code);
+  renderCkSummary(); refreshPlaceBtn();
+  return true;
+}
+function placeOrder() {
+  const t = checkoutTotals();
+  const id = 'OOO' + Date.now().toString().slice(-8);
+  const items = state.cart.map(l => lineItem(l));
+  const order = { id, date: new Date().toISOString(), items: state.cart.slice(), totals: t, delivery: CK.delivery, payment: CK.payment, name: CK.details.name.split(' ')[0], city: CK.details.city, state: CK.details.state, coupon: state.coupon || null };
+  // ---- TRACKING: add_payment_info, then purchase ----
+  track('add_payment_info', { ecommerce: { currency: 'INR', value: t.net, payment_type: CK.payment, coupon: state.coupon || null, items }, checkout: { step: 3, step_name: 'payment' } });
+  track('purchase', {
+    ecommerce: {
+      transaction_id: id, currency: 'INR',
+      value: t.net,            // merchandise value after discount (excludes shipping)
+      revenue_total: t.total,  // value + shipping
+      tax: t.tax, shipping: t.shipping, discount: t.discount,
+      coupon: state.coupon || null, payment_type: CK.payment, shipping_tier: CK.delivery,
+      items
+    },
+    checkout: { shipping_state: CK.details.state, shipping_city: CK.details.city }
+  });
+  state.orders.unshift(order); state.orders = state.orders.slice(0, 10); store.set('ooo_orders', state.orders);
+  state.cart = []; saveCart(); renderCart();
+  state.coupon = null; store.set('ooo_coupon', null);
+  CK = null;
+  location.hash = '#/order/' + id;
+}
+
+function orderView(id) {
+  const o = state.orders.find(x => x.id === id);
+  if (!o) return notFoundView();
+  const html = '<div class="wrap confirm"><div class="big-tick">' + ICON.check.replace('width="20" height="20"', 'width="34" height="34"') + '</div>' +
+    '<h1 class="display">Order placed</h1><p class="lede">Thanks, ' + esc(o.name) + '. Your order is confirmed and we\'ve sent the details to your email. Now go and enjoy the time off.</p>' +
+    '<div class="panel"><dl><div><dt>Order number</dt><dd>' + o.id + '</dd></div><div><dt>Arriving by</dt><dd>' + deliveryDate(o.delivery === 'express' ? 2 : 5) + '</dd></div><div><dt>Total paid</dt><dd>' + fmt(o.totals.total) + (o.payment === 'cod' ? ' on delivery' : '') + '</dd></div></dl>' +
+    '<div class="sum-items" style="max-height:none">' + o.items.map(l => { const p = P_BY_ID[l.id]; return '<div class="sum-item"><img src="' + p.img + '" alt=""><div><strong>' + esc(p.name) + '</strong><span class="q">' + esc([l.colour, l.size].filter(Boolean).join(', ')) + ', qty ' + l.qty + '</span></div><span>' + fmt(p.price * l.qty) + '</span></div>'; }).join('') + '</div>' +
+    '<div class="ck-actions"><a class="link-btn" href="#/help?section=track">Track this order</a><a class="btn btn-primary" href="#/shop/all">Continue shopping</a></div></div></div>';
+  return { meta: { name: 'ooo:checkout:confirmation', type: 'order_confirmation', section: 'checkout', sub: 'confirmation', title: 'Order confirmed', crumbs: ['Home', 'Order confirmation'], transaction_id: o.id }, html };
+}
+
+/* ---------- Help / contact ---------- */
+function helpView(section) {
+  const faqs = [
+    ['How long does delivery take?', 'Standard delivery takes 3 to 5 working days across India. Express delivery reaches most metro cities in 1 to 2 working days. Orders over ' + fmt(FREE_SHIP) + ' ship free.'],
+    ['How do returns work?', 'You have 30 days to return or exchange unworn items with tags. Start a return from the link in your order email and we\'ll schedule a free doorstep pickup. Refunds reach your original payment method within 5 to 7 days.'],
+    ['How do I find my size?', 'Open the size guide on any clothing product page. Our tops run slightly relaxed; if you\'re between sizes and prefer a closer fit, size down.'],
+    ['Do you offer cash on delivery?', 'Yes, on orders up to ₹15,000 at most PIN codes. UPI on delivery is also accepted.'],
+    ['Can my bag be repaired?', 'Yes. Every Out of Office bag comes with free lifetime repairs for stitching, zips and buckles. Write to us with a photo and we\'ll arrange a pickup.']
+  ];
+  const html = crumbsHTML([['Home', '#/'], ['Help centre', '']]) +
+    '<div class="wrap page-head"><div><h1 class="display">Help centre</h1><p>Answers to common questions, order tracking and a direct line to our team in Bengaluru.</p></div></div>' +
+    '<div class="wrap"><div class="contact-cards">' +
+      '<div class="contact-card"><h3>Email</h3><p><a href="mailto:hello@outofoffice.example">hello@outofoffice.example</a><br>We reply within one working day.</p></div>' +
+      '<div class="contact-card"><h3>Phone and WhatsApp</h3><p><a href="tel:+918040000000">+91 80 4000 0000</a><br>Monday to Saturday, 10 am to 7 pm.</p></div>' +
+      '<div class="contact-card"><h3>Studio store</h3><p>12, 100 Feet Road, Indiranagar, Bengaluru 560038<br>Open daily, 11 am to 9 pm.</p></div>' +
+    '</div></div>' +
+    '<div class="wrap help-grid">' +
+      '<div><h2 class="sec-title" style="font-size:28px;margin-bottom:12px">Frequently asked questions</h2>' + faqs.map((f, i) => '<details class="acc"' + (i === 0 ? ' open' : '') + '><summary>' + esc(f[0]) + '</summary><div class="acc-body">' + esc(f[1]) + '</div></details>').join('') +
+        '<div class="panel" id="track" style="margin-top:32px"><h2>Track your order</h2><p class="muted">Enter the order number from your confirmation, for example ' + (state.orders[0] ? state.orders[0].id : 'OOO12345678') + '.</p>' +
+        '<form id="trackForm" novalidate style="display:flex;gap:10px;flex-wrap:wrap"><label class="sr-only" for="trackIn">Order number</label><input id="trackIn" class="" style="flex:1;min-width:180px;height:48px;border:1px solid var(--line);border-radius:10px;padding:0 14px;background:var(--white)" placeholder="Order number"><button class="btn btn-primary" type="submit">Track order</button></form><div id="trackOut" style="margin-top:14px"></div></div>' +
+      '</div>' +
+      '<div><form class="panel" id="contactForm" novalidate><h2 id="contact">Send us a message</h2><p class="muted">Questions about sizing, an order, or a bag that needs fixing.</p><div class="form-grid">' +
+        '<div class="field"><label for="cName">Name</label><input id="cName" name="name" autocomplete="name"><p class="field-error" hidden></p></div>' +
+        '<div class="field"><label for="cEmail">Email</label><input id="cEmail" name="email" type="email" autocomplete="email"><p class="field-error" hidden></p></div>' +
+        '<div class="field full"><label for="cTopic">Topic</label><select id="cTopic" name="topic"><option>Order and delivery</option><option>Returns and exchanges</option><option>Sizing advice</option><option>Repairs</option><option>Something else</option></select></div>' +
+        '<div class="field full"><label for="cMsg">Message</label><textarea id="cMsg" name="message"></textarea><p class="field-error" hidden></p></div>' +
+      '</div><div class="ck-actions"><span class="hint">Demo form, nothing is actually sent.</span><button class="btn btn-primary" type="submit">Send message</button></div></form></div>' +
+    '</div>';
+  return {
+    meta: { name: 'ooo:help', type: 'help', section: 'help', sub: section || '', title: 'Help centre', crumbs: ['Home', 'Help centre'] },
+    html,
+    after() {
+      if (section === 'track') pendingScroll = 'track';
+      if (section === 'contact') pendingScroll = 'contactForm';
+      $('#trackForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const v = $('#trackIn').value.trim().toUpperCase(); const o = state.orders.find(x => x.id === v);
+        track('order_track', { interaction: { order_found: !!o } });
+        $('#trackOut').innerHTML = o ? '<div class="success-box"><strong>Order ' + o.id + ' is being packed</strong>Placed on ' + new Date(o.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' }) + ', ' + o.items.reduce((a, l) => a + l.qty, 0) + ' items, arriving by ' + deliveryDate(o.delivery === 'express' ? 2 : 5) + '.</div>' :
+          '<p class="field-error">We couldn\'t find order "' + esc(v || '') + '". Check the number in your confirmation email; demo orders are only stored on this device.</p>';
+      });
+      $('#contactForm').addEventListener('submit', e => {
+        e.preventDefault(); const f = e.target;
+        const a = setErr(f.elements.name, f.elements.name.value.trim().length >= 2 ? '' : 'Enter your name.');
+        const b = setErr(f.elements.email, EMAIL_RE.test(f.elements.email.value.trim()) ? '' : 'Enter a valid email address.');
+        const c = setErr(f.elements.message, f.elements.message.value.trim().length >= 10 ? '' : 'Write at least 10 characters so we can help.');
+        if (!(a && b && c)) return;
+        track('contact_submit', { form: { form_name: 'contact', topic: f.elements.topic.value } });
+        f.innerHTML = '<div class="success-box"><strong>Message sent</strong>Thanks, ' + esc(f.elements.name.value.trim().split(' ')[0]) + '. We\'ll reply to your email within one working day.</div>';
+      });
+    }
+  };
+}
+
+/* ---------- Policies ---------- */
+function policyView(key) {
+  const P = {
+    shipping: ['Shipping', '<p>We ship to over 19,000 PIN codes across India from our warehouse in Bengaluru.</p><h2>Delivery times</h2><p>Standard delivery takes 3 to 5 working days. Express delivery takes 1 to 2 working days in Bengaluru, Mumbai, Delhi NCR, Chennai, Hyderabad, Pune and Kolkata.</p><h2>Charges</h2><p>Standard delivery is free on orders over ' + fmt(FREE_SHIP) + ' and ' + fmt(149) + ' below that. Express delivery is ' + fmt(299) + '.</p><h2>Packaging</h2><p>Every order ships in recycled, plastic-free packaging.</p>'],
+    returns: ['Returns and exchanges', '<p>If something isn\'t right, send it back within 30 days of delivery.</p><h2>Conditions</h2><p>Items must be unworn and unwashed with original tags. Underwear-adjacent activewear and personalised items can\'t be returned for hygiene reasons.</p><h2>How to return</h2><p>Use the link in your order email to choose items and a pickup slot. Pickup is free. Refunds are issued to the original payment method within 5 to 7 working days of the item reaching us; cash on delivery refunds go to your bank account or as store credit.</p>'],
+    privacy: ['Privacy', '<p>This is a demo store. Cart, wishlist and order details are stored only in your browser\'s local storage and never sent to a server.</p><h2>Analytics</h2><p>Interactions are written to a JavaScript data layer (window.oooDataLayer) for analytics practice. Email addresses are not written to the data layer; only the email domain is recorded on newsletter sign-up.</p>'],
+    terms: ['Terms of use', '<p>Out of Office is a fictional brand created for analytics and web development practice. Products, prices and orders are not real and no goods will be delivered.</p><h2>Images</h2><p>Product and lifestyle photographs are loaded from Unsplash and remain the property of their photographers.</p>']
+  };
+  if (!P[key]) return notFoundView();
+  return {
+    meta: { name: 'ooo:policy:' + key, type: 'policy', section: 'policy', sub: key, title: P[key][0], crumbs: ['Home', P[key][0]] },
+    html: crumbsHTML([['Home', '#/'], [P[key][0], '']]) + '<div class="wrap page-head"><h1 class="display">' + P[key][0] + '</h1></div><div class="wrap"><div class="policy">' + P[key][1] + '<p style="margin-top:32px"><a href="#/help">Still have questions? Visit the help centre.</a></p></div></div>'
+  };
+}
+function notFoundView() {
+  return {
+    meta: { name: 'ooo:error:404', type: 'error', section: 'error', sub: '404', title: 'Page not found', crumbs: ['Home', 'Not found'] },
+    html: '<div class="wrap" style="padding:80px var(--gut)"><div class="empty"><h2>This page is also out of office</h2><p>The link may be old or mistyped. Try the search bar, or head back to the homepage.</p><a class="btn btn-primary" href="#/">Go to homepage</a></div></div>'
+  };
+}
+
+/* ----------------------------------------------------------------------
+   List & promotion impressions (IntersectionObserver)
+   view_item_list on the homepage fires when a section scrolls into view.
+   ---------------------------------------------------------------------- */
+function trackList(el) {
+  if (el.dataset.tracked) return; el.dataset.tracked = '1';
+  const listId = el.dataset.listId, listName = el.dataset.listName;
+  const items = $$('.card', el).map((c, i) => dlItem(P_BY_ID[c.dataset.id], { listId, listName, index: i + 1 }));
+  if (!items.length) return;
+  // ---- TRACKING: view_item_list ----
+  track('view_item_list', { ecommerce: { currency: 'INR', item_list_id: listId, item_list_name: listName, items } });
+}
+let listObserver = null;
+function observeLists() {
+  const els = $$('[data-track-list]:not([data-tracked])', main);
+  if (!('IntersectionObserver' in window)) { els.forEach(trackList); return; }
+  if (listObserver) listObserver.disconnect();
+  listObserver = new IntersectionObserver(entries => entries.forEach(en => { if (en.isIntersecting) { trackList(en.target); listObserver.unobserve(en.target); } }), { threshold: 0.25 });
+  els.forEach(el => listObserver.observe(el));
+}
+function observePromos() {
+  const els = $$('[data-promo]', main);
+  const fire = el => { if (el.dataset.seen) return; el.dataset.seen = '1'; track('view_promotion', { ecommerce: { promotion_id: el.dataset.promo, promotion_name: el.dataset.promoName, creative_slot: el.dataset.promoSlot } }); };
+  if (!('IntersectionObserver' in window)) { els.forEach(fire); return; }
+  const io = new IntersectionObserver(en => en.forEach(e => { if (e.isIntersecting) { fire(e.target); io.unobserve(e.target); } }), { threshold: 0.5 });
+  els.forEach(el => io.observe(el));
+}
+
+/* ----------------------------------------------------------------------
+   7. CART
+   ---------------------------------------------------------------------- */
+/** addToCart: adds or merges a line, persists, updates UI and pushes add_to_cart. */
+function addToCart(id, qty, size, colour, source) {
+  const p = P_BY_ID[id]; if (!p || !inStock(p)) return;
+  qty = Math.max(1, Math.min(10, qty || 1));
+  const key = [id, size || '', colour || ''].join('|');
+  const line = state.cart.find(l => l.key === key);
+  if (line) line.qty = Math.min(10, line.qty + qty);
+  else state.cart.push({ key, id, size: size || null, colour: colour || null, qty });
+  saveCart(); renderCart();
+  // ---- TRACKING: add_to_cart ----
+  track('add_to_cart', { ecommerce: { currency: 'INR', value: p.price * qty, items: [dlItem(p, { colour, size, quantity: qty, listName: source })] }, interaction: { add_source: source || 'unknown', cart_action: line ? 'merge' : 'new_line' } });
+  toast('Added ' + p.name + (size ? ', size ' + size : ''), 'View cart', openCart);
+}
+/** changeQty: +1 fires add_to_cart, −1 fires remove_from_cart (quantity 1). */
+function changeQty(key, delta) {
+  const line = state.cart.find(l => l.key === key); if (!line) return;
+  const p = P_BY_ID[line.id];
+  if (delta > 0 && line.qty >= 10) { toast('You can add up to 10 of each item.'); return; }
+  if (delta < 0 && line.qty <= 1) { removeLine(key); return; }
+  line.qty += delta; saveCart();
+  const item = dlItem(p, { colour: line.colour, size: line.size, quantity: 1 });
+  track(delta > 0 ? 'add_to_cart' : 'remove_from_cart', { ecommerce: { currency: 'INR', value: p.price, items: [item] }, interaction: { add_source: 'cart_drawer', cart_action: delta > 0 ? 'increment' : 'decrement' } });
+  renderCart(); if (PAGE.type === 'checkout') { renderCkSummary(); refreshPlaceBtn(); }
+}
+function removeLine(key) {
+  const line = state.cart.find(l => l.key === key); if (!line) return;
+  const p = P_BY_ID[line.id];
+  state.cart = state.cart.filter(l => l.key !== key); saveCart();
+  // ---- TRACKING: remove_from_cart ----
+  track('remove_from_cart', { ecommerce: { currency: 'INR', value: p.price * line.qty, items: [lineItem(line)] }, interaction: { cart_action: 'remove_line' } });
+  renderCart();
+  toast('Removed ' + p.name, 'Undo', () => { state.cart.push(line); saveCart(); renderCart(); track('add_to_cart', { ecommerce: { currency: 'INR', value: p.price * line.qty, items: [lineItem(line)] }, interaction: { add_source: 'undo_remove', cart_action: 'undo' } }); if (PAGE.type === 'checkout') render(); });
+  if (PAGE.type === 'checkout') { if (!state.cart.length) render(); else { renderCkSummary(); refreshPlaceBtn(); } }
+}
+function renderCart() {
+  const t = cartTotals();
+  const body = $('#cartBody'), foot = $('#cartFoot');
+  $('#cartTitle').textContent = 'Your cart' + (t.count ? ' (' + t.count + ')' : '');
+  if (!state.cart.length) {
+    body.innerHTML = '<div class="empty" style="margin-top:12px"><h3>Your cart is empty</h3><p>Nothing packed yet. Start with the pieces people buy most.</p><a class="btn btn-primary" href="#/collection/bestsellers">Shop bestsellers</a></div>';
+    foot.innerHTML = '';
+    return;
+  }
+  body.innerHTML = state.cart.map(l => {
+    const p = P_BY_ID[l.id];
+    return '<div class="cart-line"><a href="#/product/' + p.id + '"><img src="' + p.img + '" alt="' + esc(p.name) + '"></a><div>' +
+      '<div class="row" style="align-items:flex-start"><h3><a href="#/product/' + p.id + '">' + esc(p.name) + '</a></h3><strong>' + fmt(p.price * l.qty) + '</strong></div>' +
+      '<p class="var">' + esc([l.colour, l.size ? 'Size ' + l.size : ''].filter(Boolean).join(', ')) + (isSale(p) ? ', <s>' + fmt(p.mrp) + '</s> ' + fmt(p.price) + ' each' : '') + '</p>' +
+      '<div class="row"><div class="qty sm"><button type="button" data-cart-qty="-1" data-key="' + esc(l.key) + '" aria-label="Decrease quantity of ' + esc(p.name) + '">−</button><span>' + l.qty + '</span><button type="button" data-cart-qty="1" data-key="' + esc(l.key) + '" aria-label="Increase quantity of ' + esc(p.name) + '">+</button></div>' +
+      '<button type="button" class="remove" data-cart-remove="' + esc(l.key) + '">Remove</button></div></div></div>';
+  }).join('');
+  const left = FREE_SHIP - t.subtotal;
+  foot.innerHTML = '<div class="ship-bar">' + (left > 0 ? 'Add ' + fmt(left) + ' more for free delivery' : 'Your order ships free') + '<i><b style="width:' + Math.min(100, t.subtotal / FREE_SHIP * 100) + '%"></b></i></div>' +
+    '<div class="subtotal"><span>Subtotal</span><span>' + fmt(t.subtotal) + '</span></div>' +
+    (t.savings ? '<p class="small" style="margin:-6px 0 0;color:var(--pine);font-weight:600">You\'re saving ' + fmt(t.savings) + '</p>' : '') +
+    '<p class="tiny muted" style="margin:-4px 0 0">Discount codes and delivery are applied at checkout.</p>' +
+    '<button type="button" class="btn btn-primary btn-block" data-go-checkout>Checkout</button>' +
+    '<button type="button" class="link-btn" data-close style="justify-self:center">Continue shopping</button>';
+}
+function openCart() {
+  renderCart(); openOverlay('cartDrawer');
+  // ---- TRACKING: view_cart ----
+  track('view_cart', { ecommerce: { currency: 'INR', value: cartTotals().subtotal, items: state.cart.map(l => lineItem(l)) } });
+}
+function updateBadges() {
+  const c = cartTotals().count, w = state.wish.length;
+  const cb = $('#cartCount'); cb.textContent = c; cb.hidden = !c; $('#cartBtn').setAttribute('aria-label', 'Open cart, ' + c + ' items');
+  const wb = $('#wishCount'); wb.textContent = w; wb.hidden = !w; $('#wishLink').setAttribute('aria-label', 'Wishlist, ' + w + ' items');
+}
+
+/* ---------- Wishlist ---------- */
+function toggleWish(id, source) {
+  const p = P_BY_ID[id]; if (!p) return;
+  const has = state.wish.includes(id);
+  state.wish = has ? state.wish.filter(x => x !== id) : [id].concat(state.wish);
+  saveWish();
+  $$('[data-wish="' + id + '"]').forEach(b => { b.setAttribute('aria-pressed', String(!has)); b.setAttribute('aria-label', (has ? 'Add to' : 'Remove from') + ' wishlist'); });
+  // ---- TRACKING: add_to_wishlist / remove_from_wishlist ----
+  track(has ? 'remove_from_wishlist' : 'add_to_wishlist', { ecommerce: { currency: 'INR', value: p.price, items: [dlItem(p, { listName: source })] }, wishlist: { wishlist_count: state.wish.length } });
+  toast(has ? 'Removed from wishlist' : 'Saved to wishlist', has ? null : 'View wishlist', has ? null : () => { location.hash = '#/wishlist'; });
+  if (PAGE.type === 'wishlist' && has) render();
+}
+
+/* ---------- Quick view ---------- */
+function openQuickView(id, listName) {
+  const p = P_BY_ID[id]; if (!p) return;
+  addRecent(id);
+  $('#qvContent').innerHTML = '<div class="qv"><div class="qv-img"><img src="' + p.img + '" alt="' + esc(p.name) + '"></div><div class="qv-info">' +
+    '<span class="small" style="color:var(--pine);font-weight:600">' + esc(CATS[p.cat].label) + ', ' + esc(subLabel(p)) + '</span>' +
+    '<h2>' + esc(p.name) + '</h2><div class="pdp-meta">' + stars(p.rating) + '<span>' + p.rating + ' (' + p.reviews + ')</span><span>SKU ' + p.id + '</span></div>' +
+    '<div class="pdp-price">' + priceHTML(p) + '</div><p class="pdp-desc">' + esc(p.desc) + '</p><div style="margin-top:12px">' + stockHTML(p) + '</div>' +
+    buyBox(p, 'quick_view') +
+    '<a class="link-btn" href="#/product/' + p.id + '" data-select-qv="' + p.id + '">View full details</a></div></div>';
+  openOverlay('qvModal');
+  // ---- TRACKING: view_item (quick view) ----
+  track('view_item', { ecommerce: { currency: 'INR', value: p.price, items: [dlItem(p, { colour: p.colours[0], listName })] }, interaction: { view_type: 'quick_view' } });
+}
+
+/* ---------- Size guide ---------- */
+const SIZE_DATA = {
+  tops: { head: ['Size', 'Chest', 'Waist', 'Length'], rows: [['XS', 84, 70, 64], ['S', 90, 76, 67], ['M', 96, 82, 70], ['L', 102, 88, 73], ['XL', 108, 94, 75], ['XXL', 114, 100, 77]] },
+  bottoms: { head: ['Size', 'Waist', 'Hip', 'Inseam'], rows: [['XS / 28', 71, 90, 76], ['S / 30', 76, 95, 77], ['M / 32', 81, 100, 78], ['L / 34', 86, 105, 79], ['XL / 36', 91, 110, 80]] }
+};
+let sizeState = { tab: 'tops', unit: 'cm' };
+function openSizeGuide(pid) {
+  const p = pid && P_BY_ID[pid];
+  sizeState.tab = p && (p.sub === 'trousers' || p.sub === 'shorts' || (p.sub === 'activewear' && p.cat === 'women')) ? 'bottoms' : 'tops';
+  renderSizeGuide(); openOverlay('sizeModal');
+  track('size_guide_view', { interaction: { product_id: pid || null, size_chart: sizeState.tab } });
+}
+function renderSizeGuide() {
+  const d = SIZE_DATA[sizeState.tab], conv = v => sizeState.unit === 'cm' ? v : (v / 2.54).toFixed(1);
+  $('#sizeContent').innerHTML = '<h2 id="sizeTitle">Size guide</h2><p class="muted" style="margin:0">Body measurements. Our fits run slightly relaxed; size down for a closer fit.</p>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div class="tabs" role="tablist"><button type="button" role="tab" data-sg-tab="tops" aria-selected="' + (sizeState.tab === 'tops') + '">Tops and dresses</button><button type="button" role="tab" data-sg-tab="bottoms" aria-selected="' + (sizeState.tab === 'bottoms') + '">Trousers and shorts</button></div>' +
+    '<div class="tabs"><button type="button" data-sg-unit="cm" aria-selected="' + (sizeState.unit === 'cm') + '">cm</button><button type="button" data-sg-unit="in" aria-selected="' + (sizeState.unit === 'in') + '">inches</button></div></div>' +
+    '<div style="overflow:auto"><table class="size-table"><thead><tr>' + d.head.map(h => '<th scope="col">' + h + '</th>').join('') + '</tr></thead><tbody>' + d.rows.map(r => '<tr>' + r.map((c, i) => i ? '<td>' + conv(c) + '</td>' : '<th scope="row">' + c + '</th>').join('') + '</tr>').join('') + '</tbody></table></div>' +
+    '<p class="small muted" style="margin:18px 0 0">Measure your chest at the fullest point and your waist at the narrowest. Still unsure? <a href="#/help?section=contact">Ask our team</a>.</p>';
+}
+
+/* ---------- Promo popup (not on load: after 25 s or 55% scroll, once per session) ---------- */
+let promoTimer = null;
+function maybePromo() {
+  if (session.get('ooo_promo_seen', false) || state.subscribed) return;
+  if (['checkout', 'order_confirmation'].includes(PAGE.type)) return;
+  if ($('.modal.is-open, .drawer.is-open')) return;
+  session.set('ooo_promo_seen', true);
+  window.removeEventListener('scroll', onScrollPromo);
+  clearTimeout(promoTimer);
+  $('#promoContent').innerHTML = '<h2 id="promoTitle">10% off your first order</h2><p class="muted" style="margin:10px 0 0">Join the postcard list for new arrivals and packing lists, and we\'ll give you a code right away.</p>' +
+    '<form data-newsletter="popup" novalidate><div class="field"><label for="nl-popup">Email address</label><input id="nl-popup" type="email" name="email" placeholder="you@example.com" autocomplete="email"><p class="field-error" hidden></p></div><button class="btn btn-green btn-block" type="submit">Get my code</button></form>' +
+    '<button type="button" class="link-btn" data-close style="margin-top:12px;align-self:center;font-weight:500">No thanks</button>';
+  openOverlay('promoModal');
+  track('view_promotion', { ecommerce: { promotion_id: 'welcome10', promotion_name: 'Welcome 10% off', creative_slot: 'popup' } });
+}
+function onScrollPromo() { const h = document.documentElement; if ((h.scrollTop + innerHeight) / h.scrollHeight > 0.55 && h.scrollHeight > innerHeight * 1.6) maybePromo(); }
+
+/* ---------- Newsletter ---------- */
+function handleNewsletter(form) {
+  const input = form.elements.email, loc = form.dataset.newsletter, err = $('.field-error', form);
+  const v = input.value.trim();
+  if (!EMAIL_RE.test(v)) { err.textContent = 'Enter an email address like name@example.com.'; err.hidden = false; input.setAttribute('aria-invalid', 'true'); input.focus(); return; }
+  state.subscribed = true; store.set('ooo_subscribed', true);
+  // ---- TRACKING: newsletter_signup (no raw email in the data layer, domain only) ----
+  track('newsletter_signup', { newsletter: { signup_location: loc, email_domain: v.split('@')[1].toLowerCase(), offer: loc === 'popup' ? 'WELCOME10' : null } });
+  if (loc === 'popup') {
+    $('#promoContent').innerHTML = '<h2 id="promoTitle">You\'re in</h2><p class="muted" style="margin:10px 0 0">Here\'s your code. We\'ve also applied it to your cart, so it\'ll be there at checkout.</p><div class="code-reveal"><span>WELCOME10</span><span class="small" style="color:var(--pine);font-weight:600">Applied</span></div><button type="button" class="btn btn-primary btn-block" data-close>Keep shopping</button>';
+    state.coupon = 'WELCOME10'; store.set('ooo_coupon', 'WELCOME10');
+    track('coupon_apply', { coupon: { code: 'WELCOME10', success: true, location: 'popup' } });
+  } else {
+    const wrap = document.createElement('div'); wrap.innerHTML = newsletterForm(loc); form.replaceWith(wrap.firstChild);
+    toast('Subscribed. Your code WELCOME10 is waiting at checkout.');
+  }
+}
+
+/* ---------- Overlays ---------- */
+let lastFocus = null;
+function openOverlay(id) {
+  const el = document.getElementById(id);
+  lastFocus = document.activeElement;
+  $$('.drawer.is-open, .modal.is-open').forEach(o => { if (o !== el) { o.classList.remove('is-open'); o.setAttribute('aria-hidden', 'true'); } });
+  el.classList.add('is-open'); el.setAttribute('aria-hidden', 'false');
+  $('#backdrop').classList.add('is-open'); document.body.classList.add('no-scroll');
+  if (id === 'navDrawer') $('#menuBtn').setAttribute('aria-expanded', 'true');
+  setTimeout(() => { const f = el.querySelector('button, a[href], input, select'); if (f) f.focus({ preventScroll: true }); }, 60);
+}
+function closeAll() {
+  $$('.drawer.is-open, .modal.is-open').forEach(o => { o.classList.remove('is-open'); o.setAttribute('aria-hidden', 'true'); });
+  const f = $('#filters'); if (f) f.classList.remove('is-open');
+  $('#backdrop').classList.remove('is-open'); document.body.classList.remove('no-scroll');
+  $('#menuBtn').setAttribute('aria-expanded', 'false');
+  if (lastFocus && document.body.contains(lastFocus)) { try { lastFocus.focus({ preventScroll: true }); } catch (e) {} }
+  lastFocus = null;
+}
+
+/* ---------- Toast ---------- */
+function toast(msg, actionLabel, fn) {
+  const t = document.createElement('div'); t.className = 'toast';
+  t.innerHTML = '<span>' + esc(msg) + '</span>' + (actionLabel ? '<button type="button">' + esc(actionLabel) + '</button>' : '');
+  if (actionLabel) $('button', t).addEventListener('click', () => { t.remove(); fn(); });
+  const box = $('#toasts'); box.appendChild(t);
+  while (box.children.length > 3) box.firstChild.remove();
+  setTimeout(() => t.remove(), 4200);
+}
+
+/* ---------- Data layer inspector panel ---------- */
+function inspectorAdd() {
+  const c = $('#dlCount'); if (c) c.textContent = DL_ARRAY.length;
+  if ($('#inspector') && $('#inspector').classList.contains('is-open')) renderInspector();
+}
+function renderInspector() {
+  const f = ($('#insFilter').value || '').toLowerCase();
+  const list = DL_ARRAY.slice().reverse().filter(e => !f || String(e.event || '').toLowerCase().includes(f)).slice(0, 80);
+  $('#insList').innerHTML = list.length ? list.map(e => '<details class="ins-ev"><summary><b>' + esc(e.event || '(no event)') + '</b><span class="muted">' + esc((e.timestamp || '').slice(11, 19)) + '</span></summary><pre>' + esc(JSON.stringify(e, null, 2)) + '</pre></details>').join('') : '<p class="muted">No events yet.</p>';
+}
+
+/* ---------- Search suggestions ---------- */
+function showSuggest(q) {
+  const box = $('#suggest');
+  if (!q) { hideSuggest(); return; }
+  const res = searchProducts(q).slice(0, 5);
+  box.innerHTML = (res.length ? res.map(p => '<a href="#/product/' + p.id + '" data-suggest="' + p.id + '"><img src="' + p.img + '" alt=""><span><span class="s-name">' + esc(p.name) + '</span><br><span class="s-meta">' + esc(subLabel(p)) + ', ' + fmt(p.price) + '</span></span></a>').join('') +
+    '<button type="submit" class="s-name" style="justify-content:center;font-weight:600">See all results for "' + esc(q) + '"</button>' : '<p class="s-empty">No products match "' + esc(q) + '". Press Enter to search anyway.</p>');
+  box.hidden = false;
+}
+function hideSuggest() { const b = $('#suggest'); if (b) b.hidden = true; }
+
+/* ---------- Navigation ---------- */
+function buildNav() {
+  const items = [['home', 'Home', '#/']].concat(Object.keys(CATS).map(k => [k, CATS[k].label, '#/shop/' + k])).concat([['sale', 'Sale', '#/sale']]);
+  $('#mainNavList').innerHTML = items.map(it => {
+    const c = CATS[it[0]];
+    return '<li class="nav-item"><a class="nav-link' + (it[0] === 'sale' ? ' sale' : '') + '" data-nav="' + it[0] + '" href="' + it[2] + '">' + esc(it[1]) + '</a>' +
+      (c ? '<div class="mega"><ul>' + Object.keys(c.subs).map(s => '<li><a href="#/shop/' + it[0] + '/' + s + '">' + esc(c.subs[s]) + '</a></li>').join('') + '<li><a class="mega-all" href="#/shop/' + it[0] + '">Shop all ' + esc(c.label.toLowerCase()) + '</a></li></ul></div>' : '') + '</li>';
+  }).join('');
+  $('#mobileNav').innerHTML = '<div class="mnav-group"><a href="#/">Home</a></div>' + Object.keys(CATS).map(k => '<details class="mnav-group"><summary>' + esc(CATS[k].label) + '</summary><ul><li><a href="#/shop/' + k + '">Shop all</a></li>' + Object.keys(CATS[k].subs).map(s => '<li><a href="#/shop/' + k + '/' + s + '">' + esc(CATS[k].subs[s]) + '</a></li>').join('') + '</ul></details>').join('') +
+    '<div class="mnav-group"><a href="#/sale" style="color:var(--danger)">Sale</a></div><div class="mnav-group"><a href="#/collection/new">New arrivals</a></div><div class="mnav-group"><a href="#/wishlist">Wishlist</a></div><div class="mnav-group"><a href="#/help">Help and contact</a></div>';
+}
+function setActiveNav(section) { $$('[data-nav]').forEach(a => a.classList.toggle('is-active', a.dataset.nav === section)); }
+
+/* ---------- Announcement bar ---------- */
+const ANN = [
+  'Free delivery across India on orders over ' + fmt(FREE_SHIP),
+  'Use code <strong>WEEKEND15</strong> for 15% off orders over ₹4,999. <a href="#/sale">Shop the sale</a>',
+  '30-day free returns with doorstep pickup',
+  'New in: linen shirts and the Long Weekend duffel. <a href="#/collection/new">See what\'s new</a>'
+];
+let annI = 0, annT = null;
+function showAnn(d) { annI = (annI + d + ANN.length) % ANN.length; $('#annText').innerHTML = ANN[annI]; }
+function startAnn() { clearInterval(annT); if (!matchMedia('(prefers-reduced-motion: reduce)').matches) annT = setInterval(() => showAnn(1), 5000); }
+
+/* ----------------------------------------------------------------------
+   8. GLOBAL EVENT DELEGATION
+   One click listener handles every data-* action on the page.
+   ---------------------------------------------------------------------- */
+document.addEventListener('click', e => {
+  const t = e.target;
+  const q = s => t.closest(s);
+  let el;
+
+  // select_item: product clicked from a listing card
+  if ((el = q('[data-select]')) && el.closest('.card')) {
+    const c = el.closest('.card'), list = c.closest('[data-list-name]');
+    const p = P_BY_ID[c.dataset.id];
+    // ---- TRACKING: select_item ----
+    track('select_item', { ecommerce: { currency: 'INR', item_list_id: list ? list.dataset.listId : null, item_list_name: list ? list.dataset.listName : null, items: [dlItem(p, { listId: list && list.dataset.listId, listName: list && list.dataset.listName, index: +c.dataset.index })] } });
+    return; // let the link navigate
+  }
+  if ((el = q('[data-suggest]'))) {
+    const p = P_BY_ID[el.dataset.suggest];
+    track('select_item', { ecommerce: { currency: 'INR', item_list_id: 'search_suggestions', item_list_name: 'Search suggestions', items: [dlItem(p, { listId: 'search_suggestions', listName: 'Search suggestions' })] }, search: { search_term: $('#searchInput').value.trim() } });
+    $('#searchInput').value = ''; hideSuggest(); return;
+  }
+  if ((el = q('[data-select-qv]'))) {
+    const p = P_BY_ID[el.dataset.selectQv];
+    track('select_item', { ecommerce: { currency: 'INR', item_list_id: 'quick_view', item_list_name: 'Quick view', items: [dlItem(p, { listId: 'quick_view', listName: 'Quick view' })] } });
+    return;
+  }
+  if ((el = q('[data-quick]'))) { const list = el.closest('[data-list-name]'); openQuickView(el.dataset.quick, list && list.dataset.listName); return; }
+  if ((el = q('[data-quickadd]'))) {
+    const p = P_BY_ID[el.dataset.quickadd], c = el.closest('.card');
+    if (p.sizes.length) { const pop = $('.size-pop', c); pop.hidden = !pop.hidden; if (!pop.hidden) { const b = $('button:not([disabled])', pop); if (b) b.focus(); } }
+    else { const list = c.closest('[data-list-name]'); addToCart(p.id, 1, null, p.colours[0], list ? list.dataset.listName : 'listing'); }
+    return;
+  }
+  if ((el = q('[data-addsize]'))) {
+    const c = el.closest('.card'), p = P_BY_ID[c.dataset.id], list = c.closest('[data-list-name]');
+    addToCart(p.id, 1, el.dataset.addsize, p.colours[0], list ? list.dataset.listName : 'listing');
+    el.closest('.size-pop').hidden = true; return;
+  }
+  if ((el = q('[data-sizepop-close]'))) { el.closest('.size-pop').hidden = true; return; }
+  if ((el = q('[data-wish]'))) { const list = el.closest('[data-list-name]'); const bb = el.closest('[data-buybox]'); toggleWish(el.dataset.wish, list ? list.dataset.listName : bb ? bb.dataset.source : 'unknown'); return; }
+
+  // Buy box interactions (product page + quick view)
+  if ((el = q('[data-pick-colour]'))) {
+    const bb = el.closest('[data-buybox]'); bb.dataset.colour = el.dataset.pickColour;
+    $$('[data-pick-colour]', bb).forEach(b => b.setAttribute('aria-pressed', String(b === el)));
+    $('[data-colour-label]', bb).textContent = el.dataset.pickColour; return;
+  }
+  if ((el = q('[data-pick-size]'))) {
+    const bb = el.closest('[data-buybox]'); bb.dataset.size = el.dataset.pickSize;
+    $$('[data-pick-size]', bb).forEach(b => b.setAttribute('aria-pressed', String(b === el)));
+    const er = $('[data-size-error]', bb); if (er) er.hidden = true; return;
+  }
+  if ((el = q('[data-bb-qty]'))) {
+    const bb = el.closest('[data-buybox]'); const n = Math.max(1, Math.min(10, (+bb.dataset.qty || 1) + (+el.dataset.bbQty)));
+    bb.dataset.qty = n; $('[data-qty-val]', bb).textContent = n; return;
+  }
+  if ((el = q('[data-bb-add]'))) {
+    const bb = el.closest('[data-buybox]'), p = P_BY_ID[bb.dataset.buybox];
+    if (p.sizes.length && !bb.dataset.size) { const er = $('[data-size-error]', bb); er.hidden = false; const f = $('[data-pick-size]:not([disabled])', bb); if (f) f.focus(); return; }
+    addToCart(p.id, +bb.dataset.qty || 1, bb.dataset.size || null, bb.dataset.colour, bb.dataset.source);
+    if (bb.dataset.source === 'quick_view') closeAll();
+    return;
+  }
+
+  // Cart
+  if (q('#cartBtn')) { openCart(); return; }
+  if ((el = q('[data-cart-qty]'))) { changeQty(el.dataset.key, +el.dataset.cartQty); return; }
+  if ((el = q('[data-cart-remove]'))) { removeLine(el.dataset.cartRemove); return; }
+  if (q('[data-go-checkout]')) { closeAll(); if (location.hash === '#/checkout') render(); else location.hash = '#/checkout'; return; }
+
+  // Checkout navigation
+  if (q('[data-ck-back]')) { CK.step--; renderCkStep(); return; }
+  if ((el = q('[data-ck-goto]'))) { CK.step = +el.dataset.ckGoto; renderCkStep(); return; }
+
+  // Size guide
+  if ((el = q('[data-size-guide]'))) { openSizeGuide(el.dataset.sizeGuide); return; }
+  if ((el = q('[data-sg-tab]'))) { sizeState.tab = el.dataset.sgTab; renderSizeGuide(); return; }
+  if ((el = q('[data-sg-unit]'))) { sizeState.unit = el.dataset.sgUnit; renderSizeGuide(); return; }
+
+  // Listing filters
+  if (q('[data-open-filters]')) { $('#filters').classList.add('is-open'); $('#backdrop').classList.add('is-open'); document.body.classList.add('no-scroll'); return; }
+  if (q('[data-close-filters]')) { $('#filters').classList.remove('is-open'); if (!$('.drawer.is-open, .modal.is-open')) { $('#backdrop').classList.remove('is-open'); document.body.classList.remove('no-scroll'); } return; }
+  if (q('[data-clear-filters]')) { clearFilters(); return; }
+  if ((el = q('[data-pill]'))) {
+    const k = el.dataset.pill, v = el.dataset.val;
+    if (k === 'cat') { LF.cats.delete(v); const i = $('[data-f-cat="' + v + '"]'); if (i) i.checked = false; }
+    if (k === 'sub') { LF.subs.delete(v); const i = $('[data-f-sub="' + v + '"]'); if (i) i.checked = false; }
+    if (k === 'price') { LF.min = LF.PMIN; LF.max = LF.PMAX; syncRange(); }
+    if (k === 'stock') { LF.inStock = false; $('[data-f-stock]').checked = false; }
+    if (k === 'sale') { LF.onSale = false; const i = $('[data-f-sale]'); if (i) i.checked = false; }
+    renderResults(true); return;
+  }
+
+  // Home interactions
+  if ((el = q('[data-scroll]'))) {
+    e.preventDefault();
+    const target = document.getElementById(el.dataset.scroll);
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+    else { pendingScroll = el.dataset.scroll; location.hash = '#/'; }
+    return;
+  }
+  if ((el = q('[data-scroll-by]'))) { const s = $('#trendScroller'); s.scrollBy({ left: s.clientWidth * 0.8 * (+el.dataset.scrollBy), behavior: 'smooth' }); return; }
+  if ((el = q('[data-promo-click]'))) { const pr = el.closest('[data-promo]'); track('select_promotion', { ecommerce: { promotion_id: pr.dataset.promo, promotion_name: pr.dataset.promoName, creative_slot: pr.dataset.promoSlot } }); return; }
+  if (q('[data-clear-recent]')) { state.recent = []; store.set('ooo_recent', []); render(); return; }
+  if (q('[data-write-review]')) { const f = $('#revForm'); f.hidden = !f.hidden; if (!f.hidden) $('#rs5').focus(); return; }
+  if (q('[data-wish-all]')) {
+    const ids = state.wish.filter(id => inStock(P_BY_ID[id]));
+    ids.forEach(id => { const p = P_BY_ID[id]; addToCart(id, 1, p.sizes.length ? p.sizes.find(s => !(p.soldOut || []).includes(s) && s === 'M') || p.sizes.find(s => !(p.soldOut || []).includes(s)) : null, p.colours[0], 'Wishlist: add all'); });
+    if (ids.length) { toast(ids.length + ' items added. Sizes default to M where available; change them in your cart if needed.'); openCart(); }
+    return;
+  }
+
+  // Overlays
+  if (q('#menuBtn')) { openOverlay('navDrawer'); return; }
+  if (q('[data-open-inspector]')) { renderInspector(); openOverlay('inspector'); return; }
+  if (q('[data-close]') || t.id === 'backdrop' || t.classList.contains('modal')) { closeAll(); return; }
+  if (q('#navDrawer a')) { closeAll(); return; }
+
+  // Close size pickers when clicking elsewhere
+  $$('.size-pop:not([hidden])').forEach(p => { if (!p.contains(t)) p.hidden = true; });
+  if (!q('#searchForm')) hideSuggest();
+});
+
+// Forms handled globally (newsletter + reviews)
+document.addEventListener('submit', e => {
+  const f = e.target;
+  if (f.matches('[data-newsletter]')) { e.preventDefault(); handleNewsletter(f); }
+  else if (f.id === 'revForm') {
+    e.preventDefault();
+    const rating = +(f.querySelector('input[name=rating]:checked') || {}).value || 0;
+    const name = f.elements.name.value.trim(), title = f.elements.title.value.trim(), text = f.elements.text.value.trim();
+    const err = $('.field-error', f);
+    const msg = !rating ? 'Choose a star rating.' : name.length < 2 ? 'Add your name.' : title.length < 3 ? 'Add a short headline.' : text.length < 10 ? 'Write at least 10 characters.' : '';
+    if (msg) { err.textContent = msg; err.hidden = false; return; }
+    const pid = f.dataset.pid;
+    (state.userReviews[pid] = state.userReviews[pid] || []).unshift({ n: name, c: 'India', r: rating, t: title, x: text, d: daysAgo(0), v: false });
+    store.set('ooo_reviews', state.userReviews);
+    track('review_submit', { ecommerce: { currency: 'INR', items: [dlItem(P_BY_ID[pid])] }, review: { rating } });
+    const y = scrollY; render(); window.scrollTo(0, y); toast('Thanks, your review is live.');
+  }
+});
+
+// Search: live suggestions + submit to results page
+(function bindSearch() {
+  const input = $('#searchInput'); let t;
+  input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => showSuggest(input.value.trim()), 120); });
+  input.addEventListener('focus', () => { if (input.value.trim()) showSuggest(input.value.trim()); });
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') { hideSuggest(); input.blur(); } });
+  $('#searchForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const v = input.value.trim(); if (!v) { input.focus(); return; }
+    hideSuggest(); input.blur();
+    const target = '#/search?q=' + encodeURIComponent(v);
+    if (location.hash === target) render(); else location.hash = target;
+  });
+})();
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('.drawer.is-open, .modal.is-open, .filters.is-open')) closeAll(); $$('.size-pop:not([hidden])').forEach(p => { p.hidden = true; }); } });
+// Broken image fallback: swap to a branded placeholder so the layout never breaks
+document.addEventListener('error', e => { const t = e.target; if (t.tagName === 'IMG' && !t.dataset.fb) { t.dataset.fb = '1'; t.src = t.closest('.hero, .promo, .coll, .story-img, .pm-img') ? 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="8" height="10"><rect width="8" height="10" fill="#8A8476"/></svg>') : placeholderImg(t.alt); } }, true);
+
+/* ----------------------------------------------------------------------
+   9. BOOT
+   ---------------------------------------------------------------------- */
+$('#year').textContent = new Date().getFullYear();
+buildNav();
+showAnn(0); startAnn();
+$('#annPrev').addEventListener('click', () => { showAnn(-1); startAnn(); });
+$('#annNext').addEventListener('click', () => { showAnn(1); startAnn(); });
+$('#insFilter').addEventListener('input', renderInspector);
+$('#insCopy').addEventListener('click', () => {
+  const s = JSON.stringify(DL_ARRAY, null, 2);
+  (navigator.clipboard ? navigator.clipboard.writeText(s) : Promise.reject()).then(() => toast('Data layer copied as JSON'), () => { console.log(s); toast('Copy blocked by the browser, JSON printed to the console instead'); });
+});
+$('#insConsole').addEventListener('click', () => { window.oooDebug(); toast('Event table printed to the browser console'); });
+$('#resetDemo').addEventListener('click', () => {
+  ['ooo_cart', 'ooo_wishlist', 'ooo_recent', 'ooo_coupon', 'ooo_subscribed', 'ooo_reviews', 'ooo_orders'].forEach(k => store.remove(k));
+  session.remove('ooo_promo_seen');
+  state.cart = []; state.wish = []; state.recent = []; state.coupon = null; state.subscribed = false; state.userReviews = {}; state.orders = [];
+  updateBadges(); renderCart(); render(); toast('Demo data cleared');
+});
+
+updateBadges();
+renderCart();
+render();
+
+// Promo popup: never on load. Shows after 25 seconds or past 55% of a long page.
+promoTimer = setTimeout(maybePromo, 25000);
+window.addEventListener('scroll', onScrollPromo, { passive: true });
+
+console.info('%cOut of Office%c data layer ready: window.oooDataLayer\n• oooDebug() prints an event table\n• oooDebug(false) mutes console logging\n• oooDataLayer.getLatest("add_to_cart") returns the latest event of a type\n• oooDataLayer.getState() returns current page, user and cart context\n• Listen with: window.addEventListener("ooo:datalayer", e => console.log(e.detail))', 'font-weight:bold;color:#4D5B47', 'color:inherit');
+})();
+</script>
+</body>
+</html>
